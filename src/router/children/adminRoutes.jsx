@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router';
-import { AdministradorNoticias ,AdministradorPublicidad } from '../../pages/';
+import { AdministradorNoticias, AdministradorPublicidad } from '../../modules';
 
 
 export const adminRoutes = [

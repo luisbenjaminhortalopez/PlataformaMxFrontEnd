@@ -1,12 +1,20 @@
-import Logo from '../assets/logo.svg';
+import Logo from '../../../assets/Logo.svg';
+import { HamburguerButton } from './HamburgerButton';
 
-export const Sidebar = () => {
+export const Sidebar = ({ toggleSidebar }) => {
   return (
     <aside className="bg-black w-72 h-screen flex flex-col justify-between">
-    
+
       <div>
-        <div className="py-6">
-          <img src={ Logo } alt="PlataformaMX" className="h-10 mx-auto"/>
+        <div className="px-4 pt-4">
+          <HamburguerButton 
+            toggleSidebar = { toggleSidebar }
+            className={ 'p-1' }  
+          />
+        </div>
+
+        <div className="py-4">
+          <img src={Logo} alt="PlataformaMX" className="h-10 mx-auto" />
         </div>
 
         <nav className="flex flex-col">
@@ -27,3 +35,4 @@ export const Sidebar = () => {
     </aside>
   );
 };
+

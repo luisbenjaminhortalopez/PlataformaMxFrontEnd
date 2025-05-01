@@ -1,4 +1,5 @@
-import { AdminPage, HomePage, LoginPage } from '../pages';
+import { AdminPage } from '../modules/admin';
+import { HomePage, LoginPage } from '../modules';
 import { adminRoutes } from './children';
 
 export const AppRouter = [
