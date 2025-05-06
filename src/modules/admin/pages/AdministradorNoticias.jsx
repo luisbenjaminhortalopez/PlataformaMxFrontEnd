@@ -1,36 +1,72 @@
 import { useState } from "react";
-import { AddButton, DeleteConfirmationModal, NewsCard } from "../components";
+import { NewsCard, FormularioNoticiaModal, DeleteConfirmationModal, AddButton } from "../components";
 
 export const AdministradorNoticias = () => {
-  const [noticias, setNoticias] = useState([
+  const [ noticias, setNoticias ] = useState([
     {
       id: 1,
-      title: "Sheinbaum: México colaborará para que el fentanilo no llegue a EE.UU. y que haya diálogo.",
-      image: "/ruta/de/imagen1.jpg",
+      titulo:
+        "Sheinbaum: México colaborará para que el fentanilo no llegue a EE.UU. y que haya diálogo.",
+      autor: "Redacción",
+      fechaPublicacion: "2024-05-01",
+      fechaVencimiento: "2024-06-01",
+      imagen: "https://via.placeholder.com/150",
+      categoria: "Política",
+      nota: "Esta es una nota de ejemplo sobre la noticia.",
     },
     {
       id: 2,
-      title: "¿Está Elon Musk hundiendo sus acciones?",
-      image: "/ruta/de/imagen2.jpg",
+      titulo: "¿Está Elon Musk hundiendo sus acciones?",
+      autor: "Analista",
+      fechaPublicacion: "2024-05-02",
+      fechaVencimiento: "2024-06-02",
+      imagen: "https://via.placeholder.com/150",
+      categoria: "Negocios",
+      nota: "Otra nota de ejemplo para otra noticia.",
     },
   ]);
 
-  const [showModal, setShowModal] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
+  const [ formOpen, setFormOpen ] = useState( false );
+  const [ modoForm, setModoForm ] = useState( "agregar" );
+  const [ formInitialData, setFormInitialData ] = useState( null );
+  const [ showDeleteModal, setShowDeleteModal ] = useState( false );
+  const [ selectedId, setSelectedId ] = useState( null );
 
-  const handleDeleteClick = (id) => {
-    setSelectedId(id);
-    setShowModal(true);
+  const openAgregarForm = () => {
+    setModoForm("agregar");
+    setFormInitialData(null);
+    setFormOpen(true);
+  };
+
+  const openEditarForm = (data) => {
+    setModoForm("editar");
+    setFormInitialData(data);
+    setFormOpen(true);
+  };
+
+  const handleSubmit = (data) => {
+    if (modoForm === "agregar") {
+      setNoticias([...noticias, { ...data, id: Date.now() }]);
+    } else {
+      setNoticias(
+        noticias.map((n) => (n.id === data.id ? { ...n, ...data } : n))
+      );
+    }
   };
 
   const confirmDelete = () => {
     setNoticias(noticias.filter((n) => n.id !== selectedId));
-    setShowModal(false);
+    setShowDeleteModal(false);
     setSelectedId(null);
   };
 
+  const handleDeleteClick = (id) => {
+    setSelectedId(id);
+    setShowDeleteModal(true);
+  };
+
   const cancelDelete = () => {
-    setShowModal(false);
+    setShowDeleteModal(false);
     setSelectedId(null);
   };
 
@@ -41,17 +77,27 @@ export const AdministradorNoticias = () => {
       {noticias.map((n) => (
         <NewsCard
           key={n.id}
-          image={n.image}
-          title={n.title}
-          onEdit={() => {}}
+          image={n.imagen}
+          title={n.titulo}
+          onEdit={() => openEditarForm(n)}
           onDelete={() => handleDeleteClick(n.id)}
         />
       ))}
 
-      <AddButton onClick={() => {}} />
+      <AddButton
+        onClick={ openAgregarForm }
+      />
+
+      <FormularioNoticiaModal
+        isOpen={formOpen}
+        modo={modoForm}
+        initialData={formInitialData}
+        onClose={() => setFormOpen(false)}
+        onSubmit={ handleSubmit }
+      />
 
       <DeleteConfirmationModal
-        isOpen={showModal}
+        isOpen={showDeleteModal}
         onCancel={cancelDelete}
         onConfirm={confirmDelete}
       />
