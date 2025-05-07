@@ -11,11 +11,14 @@ export const FormularioNoticiaModal = ({
     id: null,
     titulo: "",
     autor: "",
-    fechaPublicacion: "",
-    fechaVencimiento: "",
-    imagen: null,
-    categoria: "",
-    nota: "",
+    fecha_publicacion: "",
+    fecha_vencimiento: "",
+    imagen_portada: null,
+    categoria_id: "",
+    seccion01: "",
+    imagen01: null,
+    seccion02: "",
+    imagen02: null,
   });
 
   const [previewURL, setPreviewURL] = useState(null);
@@ -23,17 +26,20 @@ export const FormularioNoticiaModal = ({
   useEffect(() => {
     if (modo === "editar" && initialData) {
       setForm({ ...initialData });
-      setPreviewURL(initialData.imagen);
+      setPreviewURL(initialData.imagen_portada);
     } else {
       setForm({
         id: null,
         titulo: "",
         autor: "",
-        fechaPublicacion: "",
-        fechaVencimiento: "",
-        imagen: null,
-        categoria: "",
-        nota: "",
+        fecha_publicacion: "",
+        fecha_vencimiento: "",
+        imagen_portada: null,
+        categoria_id: "",
+        seccion01: "",
+        imagen01: null,
+        seccion02: "",
+        imagen02: null,
       });
       setPreviewURL(null);
     }
@@ -45,7 +51,7 @@ export const FormularioNoticiaModal = ({
     if (files) {
       const file = files[0];
       setForm((prev) => ({ ...prev, [name]: file }));
-      setPreviewURL(URL.createObjectURL(file));
+      if (name === "imagen_portada") setPreviewURL(URL.createObjectURL(file));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
@@ -93,8 +99,8 @@ export const FormularioNoticiaModal = ({
               Publicación
               <input
                 type="date"
-                name="fechaPublicacion"
-                value={form.fechaPublicacion}
+                name="fecha_publicacion"
+                value={form.fecha_publicacion}
                 onChange={handleChange}
                 className="mt-1 p-2 rounded bg-white text-black w-full"
               />
@@ -104,8 +110,8 @@ export const FormularioNoticiaModal = ({
               Vencimiento
               <input
                 type="date"
-                name="fechaVencimiento"
-                value={form.fechaVencimiento}
+                name="fecha_vencimiento"
+                value={form.fecha_vencimiento}
                 onChange={handleChange}
                 className="mt-1 p-2 rounded bg-white text-black w-full"
               />
@@ -113,32 +119,28 @@ export const FormularioNoticiaModal = ({
           </div>
 
           <div>
-            <label className="block mb-1">Subir imagen</label>
-
+            <label className="block mb-1">Imagen portada</label>
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => document.getElementById("fileInput").click()}
+                onClick={() => document.getElementById("filePortada").click()}
                 className="px-3 py-1 bg-white text-black rounded hover:opacity-80 text-sm"
               >
                 Elegir archivo
               </button>
-
               <span className="text-xs text-gray-300">
-                {form.imagen ? form.imagen.name : "Sin archivos seleccionados"}
+                {form.imagen_portada ? form.imagen_portada.name : "Sin archivo"}
               </span>
             </div>
-
             <input
-              id="fileInput"
+              id="filePortada"
               type="file"
-              name="imagen"
+              name="imagen_portada"
               accept="image/*"
               onChange={handleChange}
               className="hidden"
             />
           </div>
-
 
           {previewURL && (
             <div className="text-center text-xs text-gray-300">
@@ -147,32 +149,91 @@ export const FormularioNoticiaModal = ({
                 alt="Previsualización"
                 className="mx-auto my-2 w-28 h-28 object-cover rounded"
               />
-              {form.imagen?.name && <p>{form.imagen.name}</p>}
-              <p>Peso: {(form.imagen?.size / 1024 / 1024).toFixed(2)} MB</p>
+              <p>{form.imagen_portada?.name}</p>
+              <p>Peso: {(form.imagen_portada?.size / 1024 / 1024).toFixed(2)} MB</p>
             </div>
           )}
 
           <label>
-            Categoría
+            Categoría (ID)
             <input
               type="text"
-              name="categoria"
-              value={form.categoria}
+              name="categoria_id"
+              value={form.categoria_id}
               onChange={handleChange}
               className="mt-1 p-2 rounded bg-white text-black w-full"
             />
           </label>
 
           <label>
-            Texto de la nota
-            <textarea
-              name="nota"
-              value={form.nota}
+            Sección 1
+            <input
+              type="text"
+              name="seccion01"
+              value={form.seccion01}
               onChange={handleChange}
               className="mt-1 p-2 rounded bg-white text-black w-full"
-              rows={4}
             />
           </label>
+
+          <div>
+            <label className="block mb-1">Imagen 1</label>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => document.getElementById("fileImg1").click()}
+                className="px-3 py-1 bg-white text-black rounded hover:opacity-80 text-sm"
+              >
+                Elegir archivo
+              </button>
+              <span className="text-xs text-gray-300">
+                {form.imagen01 ? form.imagen01.name : "Sin archivo"}
+              </span>
+            </div>
+            <input
+              id="fileImg1"
+              type="file"
+              name="imagen01"
+              accept="image/*"
+              onChange={handleChange}
+              className="hidden"
+            />
+          </div>
+
+          <label>
+            Sección 2 (opcional)
+            <input
+              type="text"
+              name="seccion02"
+              value={form.seccion02}
+              onChange={handleChange}
+              className="mt-1 p-2 rounded bg-white text-black w-full"
+            />
+          </label>
+
+          <div>
+            <label className="block mb-1">Imagen 2 (opcional)</label>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => document.getElementById("fileImg2").click()}
+                className="px-3 py-1 bg-white text-black rounded hover:opacity-80 text-sm"
+              >
+                Elegir archivo
+              </button>
+              <span className="text-xs text-gray-300">
+                {form.imagen02 ? form.imagen02.name : "Sin archivo"}
+              </span>
+            </div>
+            <input
+              id="fileImg2"
+              type="file"
+              name="imagen02"
+              accept="image/*"
+              onChange={handleChange}
+              className="hidden"
+            />
+          </div>
 
           <div className="flex gap-4 mt-4">
             <button

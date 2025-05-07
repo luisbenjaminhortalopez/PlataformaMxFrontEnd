@@ -1,36 +1,47 @@
-import { useState } from "react";
-import { NewsCard, FormularioNoticiaModal, DeleteConfirmationModal, AddButton } from "../components";
+import { useState, useEffect } from "react";
+import {
+  NewsCard,
+  FormularioNoticiaModal,
+  DeleteConfirmationModal,
+  AddButton,
+} from "../components";
+
+import {
+  obtenerNoticias,
+  agregarNoticia,
+  actualizarNoticia,
+  eliminarNoticia,
+} from "../services/noticiasService";
 
 export const AdministradorNoticias = () => {
-  const [ noticias, setNoticias ] = useState([
-    {
-      id: 1,
-      titulo:
-        "Sheinbaum: México colaborará para que el fentanilo no llegue a EE.UU. y que haya diálogo.",
-      autor: "Redacción",
-      fechaPublicacion: "2024-05-01",
-      fechaVencimiento: "2024-06-01",
-      imagen: "https://via.placeholder.com/150",
-      categoria: "Política",
-      nota: "Esta es una nota de ejemplo sobre la noticia.",
-    },
-    {
-      id: 2,
-      titulo: "¿Está Elon Musk hundiendo sus acciones?",
-      autor: "Analista",
-      fechaPublicacion: "2024-05-02",
-      fechaVencimiento: "2024-06-02",
-      imagen: "https://via.placeholder.com/150",
-      categoria: "Negocios",
-      nota: "Otra nota de ejemplo para otra noticia.",
-    },
-  ]);
+  const [noticias, setNoticias] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [ formOpen, setFormOpen ] = useState( false );
-  const [ modoForm, setModoForm ] = useState( "agregar" );
-  const [ formInitialData, setFormInitialData ] = useState( null );
-  const [ showDeleteModal, setShowDeleteModal ] = useState( false );
-  const [ selectedId, setSelectedId ] = useState( null );
+  const [formOpen, setFormOpen] = useState(false);
+  const [modoForm, setModoForm] = useState("agregar");
+  const [formInitialData, setFormInitialData] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const fetchNoticias = async () => {
+    try {
+      const { data } = await obtenerNoticias();
+      const formateadas = data.map((n) => ({
+        id: n.id,
+        titulo: n.titulo,
+        imagen: n.imagen_portada,
+      }));
+      setNoticias(formateadas);
+    } catch (error) {
+      console.error("Error al obtener noticias:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNoticias();
+  }, []);
 
   const openAgregarForm = () => {
     setModoForm("agregar");
@@ -44,20 +55,38 @@ export const AdministradorNoticias = () => {
     setFormOpen(true);
   };
 
-  const handleSubmit = (data) => {
-    if (modoForm === "agregar") {
-      setNoticias([...noticias, { ...data, id: Date.now() }]);
-    } else {
-      setNoticias(
-        noticias.map((n) => (n.id === data.id ? { ...n, ...data } : n))
-      );
+  const handleSubmit = async (data) => {
+    try {
+      if (modoForm === "agregar") {
+        const response = await agregarNoticia(data);
+        const { id, imagenes } = response.data;
+
+        const nuevaNoticia = {
+          id,
+          titulo: data.titulo,
+          imagen: imagenes.imagen_portada,
+        };
+
+        setNoticias((prev) => [...prev, nuevaNoticia]);
+      } else {
+        await actualizarNoticia(data.id, data);
+        await fetchNoticias(); 
+      }
+    } catch (error) {
+      console.error("Error al guardar noticia:", error);
     }
   };
 
-  const confirmDelete = () => {
-    setNoticias(noticias.filter((n) => n.id !== selectedId));
-    setShowDeleteModal(false);
-    setSelectedId(null);
+  const confirmDelete = async () => {
+    try {
+      await eliminarNoticia(selectedId);
+      setNoticias(noticias.filter((n) => n.id !== selectedId));
+    } catch (error) {
+      console.error("Error al eliminar noticia:", error);
+    } finally {
+      setShowDeleteModal(false);
+      setSelectedId(null);
+    }
   };
 
   const handleDeleteClick = (id) => {
@@ -74,26 +103,28 @@ export const AdministradorNoticias = () => {
     <div className="relative p-10 w-full">
       <h1 className="text-3xl font-bold mb-6">ADMINISTRAR NOTICIAS</h1>
 
-      {noticias.map((n) => (
-        <NewsCard
-          key={n.id}
-          image={n.imagen}
-          title={n.titulo}
-          onEdit={() => openEditarForm(n)}
-          onDelete={() => handleDeleteClick(n.id)}
-        />
-      ))}
+      {loading ? (
+        <p className="text-center text-gray-500">Cargando noticias...</p>
+      ) : (
+        noticias.map((n) => (
+          <NewsCard
+            key={n.id}
+            image={n.imagen}
+            title={n.titulo}
+            onEdit={() => openEditarForm(n)}
+            onDelete={() => handleDeleteClick(n.id)}
+          />
+        ))
+      )}
 
-      <AddButton
-        onClick={ openAgregarForm }
-      />
+      <AddButton onClick={openAgregarForm} />
 
       <FormularioNoticiaModal
         isOpen={formOpen}
         modo={modoForm}
         initialData={formInitialData}
         onClose={() => setFormOpen(false)}
-        onSubmit={ handleSubmit }
+        onSubmit={handleSubmit}
       />
 
       <DeleteConfirmationModal
