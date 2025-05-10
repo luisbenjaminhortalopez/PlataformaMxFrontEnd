@@ -11,7 +11,7 @@ import {
   agregarNoticia,
   actualizarNoticia,
   eliminarNoticia,
-} from "../services/noticiasService";
+} from "../services";
 
 export const AdministradorNoticias = () => {
   const [noticias, setNoticias] = useState([]);
@@ -70,7 +70,7 @@ export const AdministradorNoticias = () => {
         setNoticias((prev) => [...prev, nuevaNoticia]);
       } else {
         await actualizarNoticia(data.id, data);
-        await fetchNoticias(); 
+        await fetchNoticias();
       }
     } catch (error) {
       console.error("Error al guardar noticia:", error);
@@ -100,21 +100,27 @@ export const AdministradorNoticias = () => {
   };
 
   return (
-    <div className="relative p-10 w-full">
+    <div className="relative p-10 w-full min-h-screen">
       <h1 className="text-3xl font-bold mb-6">ADMINISTRAR NOTICIAS</h1>
 
       {loading ? (
-        <p className="text-center text-gray-500">Cargando noticias...</p>
+        <p className="text-center text-gray-500 mt-10">Cargando noticias...</p>
+      ) : noticias.length === 0 ? (
+        <p className="text-center text-gray-400 mt-10 italic">
+          Todavía no hay noticias registradas.
+        </p>
       ) : (
-        noticias.map((n) => (
-          <NewsCard
-            key={n.id}
-            image={n.imagen}
-            title={n.titulo}
-            onEdit={() => openEditarForm(n)}
-            onDelete={() => handleDeleteClick(n.id)}
-          />
-        ))
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {noticias.map((n) => (
+            <NewsCard
+              key={n.id}
+              image={n.imagen}
+              title={n.titulo}
+              onEdit={() => openEditarForm(n)}
+              onDelete={() => handleDeleteClick(n.id)}
+            />
+          ))}
+        </div>
       )}
 
       <AddButton onClick={openAgregarForm} />

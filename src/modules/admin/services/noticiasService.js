@@ -33,6 +33,9 @@ export const actualizarNoticia = (id, data) => {
   });
 };
 
+export const obtenerCategorias = () => {
+  return axios.get(`${API_BASE}/noticias/obtener-categorias`);
+};
 
 export const eliminarNoticia = (id) => {
   return axios.delete(`${API_BASE}/noticias/eliminar-noticia/${id}`);
