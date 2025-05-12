@@ -22,7 +22,12 @@ export const FormularioNoticiaModal = ({
     imagen02: null,
   });
 
-  const [previewURL, setPreviewURL] = useState(null);
+  const [previews, setPreviews] = useState({
+    imagen_portada: null,
+    imagen01: null,
+    imagen02: null
+  });
+  
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState("");
 
@@ -40,8 +45,25 @@ export const FormularioNoticiaModal = ({
 
   useEffect(() => {
     if (modo === "editar" && initialData) {
-      setForm({ ...initialData });
-      setPreviewURL(initialData.imagen_portada);
+      setForm({
+        id: initialData.id,
+        titulo: initialData.titulo || "",
+        autor: initialData.autor || "",
+        fecha_publicacion: initialData.fecha_publicacion || "",
+        fecha_vencimiento: initialData.fecha_vencimiento || "",
+        imagen_portada: null,
+        categoria_id: initialData.categoria_id?.toString() || "",
+        seccion01: initialData.seccion01 || "",
+        imagen01: null, 
+        seccion02: initialData.seccion02 || "",
+        imagen02: null, 
+      });
+      
+      setPreviews({
+        imagen_portada: initialData.imagen_portada_url || null,
+        imagen01: initialData.imagen01_url || null,
+        imagen02: initialData.imagen02_url || null
+      });
     } else {
       setForm({
         id: null,
@@ -56,10 +78,15 @@ export const FormularioNoticiaModal = ({
         seccion02: "",
         imagen02: null,
       });
-      setPreviewURL(null);
+      
+      setPreviews({
+        imagen_portada: null,
+        imagen01: null,
+        imagen02: null
+      });
     }
     setError("");
-  }, [isOpen]);
+  }, [isOpen, initialData, modo]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -67,7 +94,13 @@ export const FormularioNoticiaModal = ({
     if (files) {
       const file = files[0];
       setForm((prev) => ({ ...prev, [name]: file }));
-      if (name === "imagen_portada") setPreviewURL(URL.createObjectURL(file));
+      
+      if (file) {
+        setPreviews(prev => ({
+          ...prev,
+          [name]: URL.createObjectURL(file)
+        }));
+      }
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
@@ -80,15 +113,38 @@ export const FormularioNoticiaModal = ({
     if (!form.fecha_vencimiento) return setError("La fecha de vencimiento es obligatoria.");
     if (!form.categoria_id) return setError("Selecciona una categoría.");
     if (!form.seccion01.trim()) return setError("La sección 1 es obligatoria.");
-    if (modo === "agregar" && !form.imagen_portada) return setError("La imagen portada es obligatoria.");
-    if (modo === "agregar" && !form.imagen01) return setError("La imagen 1 es obligatoria.");
+    
+    if (modo === "agregar") {
+      if (!form.imagen_portada) return setError("La imagen portada es obligatoria.");
+      if (!form.imagen01) return setError("La imagen 1 es obligatoria.");
+    }
+
+    const formData = { ...form };
+    
+    if (modo === "editar") {
+      if (!formData.imagen_portada && initialData.imagen_portada_url) {
+        formData.imagen_portada_url = initialData.imagen_portada_url;
+      }
+      
+      if (!formData.imagen01 && initialData.imagen01_url) {
+        formData.imagen01_url = initialData.imagen01_url;
+      }
+      
+      if (!formData.imagen02 && initialData.imagen02_url) {
+        formData.imagen02_url = initialData.imagen02_url;
+      }
+    }
 
     setError("");
-    onSubmit({ ...form });
+    onSubmit(formData);
     onClose();
   };
 
   if (!isOpen) return null;
+
+  const showImagePortada = previews.imagen_portada !== null;
+  const showImagen01 = previews.imagen01 !== null;
+  const showImagen02 = previews.imagen02 !== null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
@@ -155,7 +211,7 @@ export const FormularioNoticiaModal = ({
                 Elegir archivo
               </button>
               <span className="text-xs text-gray-300">
-                {form.imagen_portada ? form.imagen_portada.name : "Sin archivo"}
+                {form.imagen_portada ? form.imagen_portada.name : modo === "editar" && previews.imagen_portada ? "Imagen actual" : "Sin archivo"}
               </span>
             </div>
             <input
@@ -168,15 +224,19 @@ export const FormularioNoticiaModal = ({
             />
           </div>
 
-          {previewURL && (
+          {showImagePortada && (
             <div className="text-center text-xs text-gray-300">
               <img
-                src={previewURL}
+                src={previews.imagen_portada}
                 alt="Previsualización"
                 className="mx-auto my-2 w-28 h-28 object-cover rounded"
               />
-              <p>{form.imagen_portada?.name}</p>
-              <p>Peso: {(form.imagen_portada?.size / 1024 / 1024).toFixed(2)} MB</p>
+              {form.imagen_portada && (
+                <>
+                  <p>{form.imagen_portada.name}</p>
+                  <p>Peso: {(form.imagen_portada.size / 1024 / 1024).toFixed(2)} MB</p>
+                </>
+              )}
             </div>
           )}
 
@@ -219,7 +279,7 @@ export const FormularioNoticiaModal = ({
                 Elegir archivo
               </button>
               <span className="text-xs text-gray-300">
-                {form.imagen01 ? form.imagen01.name : "Sin archivo"}
+                {form.imagen01 ? form.imagen01.name : modo === "editar" && previews.imagen01 ? "Imagen actual" : "Sin archivo"}
               </span>
             </div>
             <input
@@ -231,6 +291,22 @@ export const FormularioNoticiaModal = ({
               className="hidden"
             />
           </div>
+
+          {showImagen01 && (
+            <div className="text-center text-xs text-gray-300">
+              <img
+                src={previews.imagen01}
+                alt="Previsualización"
+                className="mx-auto my-2 w-28 h-28 object-cover rounded"
+              />
+              {form.imagen01 && (
+                <>
+                  <p>{form.imagen01.name}</p>
+                  <p>Peso: {(form.imagen01.size / 1024 / 1024).toFixed(2)} MB</p>
+                </>
+              )}
+            </div>
+          )}
 
           <label>
             Sección 2 (opcional)
@@ -254,7 +330,7 @@ export const FormularioNoticiaModal = ({
                 Elegir archivo
               </button>
               <span className="text-xs text-gray-300">
-                {form.imagen02 ? form.imagen02.name : "Sin archivo"}
+                {form.imagen02 ? form.imagen02.name : modo === "editar" && previews.imagen02 ? "Imagen actual" : "Sin archivo"}
               </span>
             </div>
             <input
@@ -266,6 +342,22 @@ export const FormularioNoticiaModal = ({
               className="hidden"
             />
           </div>
+
+          {showImagen02 && (
+            <div className="text-center text-xs text-gray-300">
+              <img
+                src={previews.imagen02}
+                alt="Previsualización"
+                className="mx-auto my-2 w-28 h-28 object-cover rounded"
+              />
+              {form.imagen02 && (
+                <>
+                  <p>{form.imagen02.name}</p>
+                  <p>Peso: {(form.imagen02.size / 1024 / 1024).toFixed(2)} MB</p>
+                </>
+              )}
+            </div>
+          )}
 
           {error && (
             <p className="text-center text-red-400 text-sm mt-2">{error}</p>

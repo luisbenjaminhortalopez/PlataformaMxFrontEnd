@@ -1,9 +1,8 @@
 export const AddButton = ({ onClick }) => (
-    <button
-      onClick={ onClick }
-      className="absolute top-6 right-6 w-9 h-9 bg-black text-white text-xl rounded-md flex items-center justify-center hover:scale-105 transition shadow"
-    >
-      +
-    </button>
+  <button
+    onClick={onClick}
+    className="fixed bottom-6 right-6 w-12 h-12 bg-black text-white text-2xl rounded-full flex items-center justify-center hover:scale-105 transition shadow-lg z-50"
+  >
+    +
+  </button>
 );
-  

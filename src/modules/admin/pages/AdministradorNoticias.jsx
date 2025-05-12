@@ -1,113 +1,69 @@
 import { useState, useEffect } from "react";
 import {
-  NewsCard,
   FormularioNoticiaModal,
   DeleteConfirmationModal,
   AddButton,
+  SeccionNoticias
 } from "../components";
+import { useNoticias } from "../hooks";
 
-import {
-  agregarNoticia,
-  actualizarNoticia,
-  eliminarNoticia,
-} from "../services";
 
-import { 
-  obtenerDetalleNoticia,
-  obtenerNoticias 
-} from "../../config";
+export const MODO_FORM = {
+  AGREGAR: "agregar",
+  EDITAR: "editar"
+};
 
 export const AdministradorNoticias = () => {
-  const [noticias, setNoticias] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const [formOpen, setFormOpen] = useState(false);
-  const [modoForm, setModoForm] = useState("agregar");
+  const [modoForm, setModoForm] = useState(MODO_FORM.AGREGAR);
   const [formInitialData, setFormInitialData] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
- const fetchNoticias = async () => {
-  try {
-    const { data } = await obtenerNoticias();
-    const formateadas = data.map((noticia) => ({
-      id: noticia.id,
-      title: noticia.titulo,
-      image: noticia.imagen_portada,
-      fechaPublicacion: noticia.fecha_publicacion,
-      fechaVencimiento: noticia.fecha_vencimiento,
-    }));
-    setNoticias(formateadas);
-  } catch (error) {
-    console.error("Error al obtener noticias:", error);
-  } finally {
-    setLoading(false);
-  }
-};
-
+  const {
+    noticias,
+    loading,
+    noticiasActivas,
+    noticiasVencidas,
+    fetchNoticias,
+    agregarNuevaNoticia,
+    actualizarNoticiaExistente,
+    obtenerDetalleCompleto,
+    eliminarNoticiaById
+  } = useNoticias();
 
   useEffect(() => {
     fetchNoticias();
-  }, []);
+  }, [fetchNoticias]);
 
   const openAgregarForm = () => {
-    setModoForm("agregar");
+    setModoForm(MODO_FORM.AGREGAR);
     setFormInitialData(null);
     setFormOpen(true);
   };
 
-
   const openEditarForm = async (noticiaResumen) => {
     try {
-      const { data: detalle } = await obtenerDetalleNoticia(noticiaResumen.id);
-
-      const noticiaCompleta = {
-        ...detalle,
-        imagen_portada: detalle.imagen_portada ?? null,
-        imagen01: null, 
-        imagen02: null,
-      };
-
-      setModoForm("editar");
-      setFormInitialData(noticiaCompleta);
+      const detalleNoticia = await obtenerDetalleCompleto(noticiaResumen.id);
+      setModoForm(MODO_FORM.EDITAR);
+      setFormInitialData(detalleNoticia);
       setFormOpen(true);
     } catch (err) {
       console.error("Error al obtener detalle de la noticia:", err);
     }
   };
 
-
   const handleSubmit = async (data) => {
     try {
-      if (modoForm === "agregar") {
-        const response = await agregarNoticia(data);
-        const { id, imagenes } = response.data;
-
-        const nuevaNoticia = {
-          id,
-          titulo: data.titulo,
-          imagen: imagenes.imagen_portada,
-        };
-
-        setNoticias((prev) => [...prev, nuevaNoticia]);
+      if (modoForm === MODO_FORM.AGREGAR) {
+        await agregarNuevaNoticia(data);
       } else {
-        await actualizarNoticia(data.id, data);
-        await fetchNoticias();
+        await actualizarNoticiaExistente(data);
       }
+      setFormOpen(false);
     } catch (error) {
       console.error("Error al guardar noticia:", error);
-    }
-  };
-
-  const confirmDelete = async () => {
-    try {
-      await eliminarNoticia(selectedId);
-      setNoticias(noticias.filter((n) => n.id !== selectedId));
-    } catch (error) {
-      console.error("Error al eliminar noticia:", error);
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedId(null);
     }
   };
 
@@ -116,7 +72,17 @@ export const AdministradorNoticias = () => {
     setShowDeleteModal(true);
   };
 
-  const cancelDelete = () => {
+  const confirmDelete = async () => {
+    try {
+      await eliminarNoticiaById(selectedId);
+    } catch (error) {
+      console.error("Error al eliminar noticia:", error);
+    } finally {
+      closeDeleteModal();
+    }
+  };
+
+  const closeDeleteModal = () => {
     setShowDeleteModal(false);
     setSelectedId(null);
   };
@@ -125,24 +91,7 @@ export const AdministradorNoticias = () => {
     <div className="relative p-10 w-full min-h-screen">
       <h1 className="text-3xl font-bold mb-6">ADMINISTRAR NOTICIAS</h1>
 
-      {loading ? (
-        <p className="text-center text-gray-500 mt-10">Cargando noticias...</p>
-      ) : noticias.length === 0 ? (
-        <p className="text-center text-gray-400 mt-10 italic">
-          Todavía no hay noticias registradas.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {noticias.map((noticia) => (
-            <NewsCard
-              key={noticia.id}
-              {...noticia}
-              onEdit={() => openEditarForm(noticia)}
-              onDelete={() => handleDeleteClick(noticia.id)}
-            />
-          ))}
-        </div>
-      )}
+      {renderContenido(loading, noticias, noticiasActivas, noticiasVencidas, openEditarForm, handleDeleteClick)}
 
       <AddButton onClick={openAgregarForm} />
 
@@ -156,9 +105,46 @@ export const AdministradorNoticias = () => {
 
       <DeleteConfirmationModal
         isOpen={showDeleteModal}
-        onCancel={cancelDelete}
+        onCancel={closeDeleteModal}
         onConfirm={confirmDelete}
       />
     </div>
+  );
+};
+
+const renderContenido = (loading, noticias, noticiasActivas, noticiasVencidas, onEdit, onDelete) => {
+  if (loading) {
+    return <p className="text-center text-gray-500 mt-10">Cargando noticias...</p>;
+  }
+  
+  if (noticias.length === 0) {
+    return (
+      <p className="text-center text-gray-400 mt-10 italic">
+        Todavía no hay noticias registradas.
+      </p>
+    );
+  }
+  
+  return (
+    <>
+      {noticiasActivas.length > 0 && (
+        <SeccionNoticias
+          titulo="🟢 Noticias Activas"
+          noticias={noticiasActivas}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          className="mb-10"
+        />
+      )}
+
+      {noticiasVencidas.length > 0 && (
+        <SeccionNoticias
+          titulo="🔴 Noticias Vencidas"
+          noticias={noticiasVencidas}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
+      )}
+    </>
   );
 };

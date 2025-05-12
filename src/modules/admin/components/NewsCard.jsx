@@ -20,9 +20,8 @@ export const NewsCard = ({
   const estaVencida = new Date(fechaVencimiento) < new Date();
 
   return (
-    <div className="relative w-full max-w-xl mx-auto bg-white border border-black rounded overflow-hidden shadow-lg mb-6 h-[300px]">
+    <div className="relative bg-white border border-black rounded overflow-hidden shadow-lg h-[300px] w-full max-w-[350px]">
       <img src={image} alt="Noticia" className="w-full h-1/2 object-cover" />
-
       <div className="h-1/2 flex flex-col justify-center items-center px-4 text-center">
         <p className="text-xl font-semibold mb-2">{title}</p>
         <p className={`text-sm ${estaVencida ? "text-red-500" : "text-gray-600"}`}>

@@ -5,3 +5,4 @@ export * from './HamburgerButton';
 export * from './NewsCard';
 export * from './Sidebar';
 export * from './OptionsMenu';
+export * from './SeccionNoticias';
