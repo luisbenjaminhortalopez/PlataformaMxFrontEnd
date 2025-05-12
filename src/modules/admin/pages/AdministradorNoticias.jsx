@@ -11,7 +11,8 @@ import {
   agregarNoticia,
   actualizarNoticia,
   eliminarNoticia,
-} from "../services/noticiasService";
+  obtenerDetalleNoticia,
+} from "../services";
 
 export const AdministradorNoticias = () => {
   const [noticias, setNoticias] = useState([]);
@@ -23,21 +24,24 @@ export const AdministradorNoticias = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
-  const fetchNoticias = async () => {
-    try {
-      const { data } = await obtenerNoticias();
-      const formateadas = data.map((n) => ({
-        id: n.id,
-        titulo: n.titulo,
-        imagen: n.imagen_portada,
-      }));
-      setNoticias(formateadas);
-    } catch (error) {
-      console.error("Error al obtener noticias:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchNoticias = async () => {
+  try {
+    const { data } = await obtenerNoticias();
+    const formateadas = data.map((noticia) => ({
+      id: noticia.id,
+      title: noticia.titulo,
+      image: noticia.imagen_portada,
+      fechaPublicacion: noticia.fecha_publicacion,
+      fechaVencimiento: noticia.fecha_vencimiento,
+    }));
+    setNoticias(formateadas);
+  } catch (error) {
+    console.error("Error al obtener noticias:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchNoticias();
@@ -49,11 +53,26 @@ export const AdministradorNoticias = () => {
     setFormOpen(true);
   };
 
-  const openEditarForm = (data) => {
-    setModoForm("editar");
-    setFormInitialData(data);
-    setFormOpen(true);
+
+  const openEditarForm = async (noticiaResumen) => {
+    try {
+      const { data: detalle } = await obtenerDetalleNoticia(noticiaResumen.id);
+
+      const noticiaCompleta = {
+        ...detalle,
+        imagen_portada: detalle.imagen_portada ?? null,
+        imagen01: null, 
+        imagen02: null,
+      };
+
+      setModoForm("editar");
+      setFormInitialData(noticiaCompleta);
+      setFormOpen(true);
+    } catch (err) {
+      console.error("Error al obtener detalle de la noticia:", err);
+    }
   };
+
 
   const handleSubmit = async (data) => {
     try {
@@ -70,7 +89,7 @@ export const AdministradorNoticias = () => {
         setNoticias((prev) => [...prev, nuevaNoticia]);
       } else {
         await actualizarNoticia(data.id, data);
-        await fetchNoticias(); 
+        await fetchNoticias();
       }
     } catch (error) {
       console.error("Error al guardar noticia:", error);
@@ -100,21 +119,26 @@ export const AdministradorNoticias = () => {
   };
 
   return (
-    <div className="relative p-10 w-full">
+    <div className="relative p-10 w-full min-h-screen">
       <h1 className="text-3xl font-bold mb-6">ADMINISTRAR NOTICIAS</h1>
 
       {loading ? (
-        <p className="text-center text-gray-500">Cargando noticias...</p>
+        <p className="text-center text-gray-500 mt-10">Cargando noticias...</p>
+      ) : noticias.length === 0 ? (
+        <p className="text-center text-gray-400 mt-10 italic">
+          Todavía no hay noticias registradas.
+        </p>
       ) : (
-        noticias.map((n) => (
-          <NewsCard
-            key={n.id}
-            image={n.imagen}
-            title={n.titulo}
-            onEdit={() => openEditarForm(n)}
-            onDelete={() => handleDeleteClick(n.id)}
-          />
-        ))
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {noticias.map((noticia) => (
+            <NewsCard
+              key={noticia.id}
+              {...noticia}
+              onEdit={() => openEditarForm(noticia)}
+              onDelete={() => handleDeleteClick(noticia.id)}
+            />
+          ))}
+        </div>
       )}
 
       <AddButton onClick={openAgregarForm} />

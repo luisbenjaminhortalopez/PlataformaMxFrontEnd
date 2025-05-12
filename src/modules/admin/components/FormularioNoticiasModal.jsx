@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { obtenerCategorias } from "../services";
 
 export const FormularioNoticiaModal = ({
   isOpen,
@@ -22,6 +23,20 @@ export const FormularioNoticiaModal = ({
   });
 
   const [previewURL, setPreviewURL] = useState(null);
+  const [categorias, setCategorias] = useState([]);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const { data } = await obtenerCategorias();
+        setCategorias(data);
+      } catch (err) {
+        console.error("Error al obtener categorías:", err);
+      }
+    };
+    fetchCategorias();
+  }, []);
 
   useEffect(() => {
     if (modo === "editar" && initialData) {
@@ -43,6 +58,7 @@ export const FormularioNoticiaModal = ({
       });
       setPreviewURL(null);
     }
+    setError("");
   }, [isOpen]);
 
   const handleChange = (e) => {
@@ -58,6 +74,16 @@ export const FormularioNoticiaModal = ({
   };
 
   const handleSubmit = () => {
+    if (!form.titulo.trim()) return setError("El título es obligatorio.");
+    if (!form.autor.trim()) return setError("El autor es obligatorio.");
+    if (!form.fecha_publicacion) return setError("La fecha de publicación es obligatoria.");
+    if (!form.fecha_vencimiento) return setError("La fecha de vencimiento es obligatoria.");
+    if (!form.categoria_id) return setError("Selecciona una categoría.");
+    if (!form.seccion01.trim()) return setError("La sección 1 es obligatoria.");
+    if (modo === "agregar" && !form.imagen_portada) return setError("La imagen portada es obligatoria.");
+    if (modo === "agregar" && !form.imagen01) return setError("La imagen 1 es obligatoria.");
+
+    setError("");
     onSubmit({ ...form });
     onClose();
   };
@@ -155,14 +181,20 @@ export const FormularioNoticiaModal = ({
           )}
 
           <label>
-            Categoría (ID)
-            <input
-              type="text"
+            Categoría
+            <select
               name="categoria_id"
               value={form.categoria_id}
               onChange={handleChange}
               className="mt-1 p-2 rounded bg-white text-black w-full"
-            />
+            >
+              <option value="">Selecciona una categoría</option>
+              {categorias.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.categoria}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label>
@@ -234,6 +266,10 @@ export const FormularioNoticiaModal = ({
               className="hidden"
             />
           </div>
+
+          {error && (
+            <p className="text-center text-red-400 text-sm mt-2">{error}</p>
+          )}
 
           <div className="flex gap-4 mt-4">
             <button

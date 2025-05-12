@@ -1,23 +1,29 @@
-import { AdminPage } from '../modules/admin';
-import { HomePage, LoginPage, DetailPage } from '../modules';
-import { adminRoutes } from './children';
+import { HomePage, LoginPage, DetailPage } from "../modules";
+import { adminRoutes } from "./children";
+import { AdminPage } from "../modules/admin";
+import { ProtectedRoute } from "./components";
 
 export const AppRouter = [
   {
-    path: '/',
+    path: "/",
     element: <HomePage />,
   },
   {
-    path: '/news/:id',
-    element: <DetailPage />
+    path: "/news/:id",
+    element: <DetailPage />,
   },
   {
-    path: '/login',
+    path: "/login",
     element: <LoginPage />,
   },
   {
-    path: '/admin',
-    element: <AdminPage />,
-    children: adminRoutes,
+    path: "/admin",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <AdminPage />, 
+        children: adminRoutes,
+      },
+    ],
   },
 ];
