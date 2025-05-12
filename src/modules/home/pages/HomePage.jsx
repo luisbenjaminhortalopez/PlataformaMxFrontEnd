@@ -3,10 +3,11 @@ import { useNavigate } from "react-router";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import logo from "../../../assets/Logo.svg";
 import { MainNew, SecondNew, MoreNewsCard } from "../components";
-import { obtenerNoticias } from "../../config";
+import { obtenerNoticias, obtenerPublicidad } from "../../config";
 
 export const HomePage = () => {
   const [newsData, setNewsData] = useState(null);
+  const [banner, setBanner] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -17,54 +18,67 @@ export const HomePage = () => {
 
   useEffect(() => {
     const fetchNewsData = async () => {
-  try {
-    setLoading(true);
+      try {
+        setLoading(true);
 
-    const response = await obtenerNoticias();
+        const response = await obtenerNoticias();
+        const data = Array.isArray(response) ? response : response.data;
 
-    console.log("Respuesta completa de la API:", response);
+        if (!Array.isArray(data)) {
+          throw new Error("La respuesta de noticias no es un array.");
+        }
 
-    // Si la API devuelve un objeto con la propiedad `data`, ajústalo aquí
-    const data = Array.isArray(response) ? response : response.data;
+        const ordenadas = [...data].sort(
+          (a, b) => new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion)
+        );
 
-    if (!Array.isArray(data)) {
-      throw new Error("La respuesta de noticias no es un array.");
-    }
+        const principal = ordenadas[0];
+        const siguientes = ordenadas.slice(1, 5);
+        const restantes = ordenadas.slice(5);
 
-    const ordenadas = [...data].sort(
-      (a, b) => new Date(b.fecha_publicacion) - new Date(a.fecha_publicacion)
-    );
+        setNewsData({
+          slide: {
+            id: principal.id,
+            image: principal.imagen_portada,
+            title: principal.titulo,
+          },
+          secondNews: siguientes.map((n) => ({
+            id: n.id,
+            image: n.imagen_portada,
+            description: n.titulo,
+          })),
+          more: restantes.map((n) => ({
+            id: n.id,
+            image: n.imagen_portada,
+            description: n.titulo,
+          })),
+        });
+      } catch (err) {
+        setError(err.message);
+        console.error("Error loading news:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    const principal = ordenadas[0];
-    const siguientes = ordenadas.slice(1, 5);
-    const restantes = ordenadas.slice(5);
+    const fetchPublicidad = async () => {
+      try {
+        const res = await obtenerPublicidad();
+        const lista = res.data;
+        const ahora = new Date();
+        const vigentes = lista.filter(pub => new Date(pub.fecha_expiracion) > ahora);
 
-    setNewsData({
-      slide: {
-        id: principal.id,
-        image: principal.imagen_portada,
-        title: principal.titulo,
-      },
-      secondNews: siguientes.map((n) => ({
-        id: n.id,
-        image: n.imagen_portada,
-        description: n.titulo,
-      })),
-      more: restantes.map((n) => ({
-        id: n.id,
-        image: n.imagen_portada,
-        description: n.titulo,
-      })),
-    });
-  } catch (err) {
-    setError(err.message);
-    console.error("Error loading news:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+        if (vigentes.length > 0) {
+          const aleatoria = vigentes[Math.floor(Math.random() * vigentes.length)];
+          setBanner(aleatoria.imagen);
+        }
+      } catch (err) {
+        console.error("Error al obtener publicidad:", err);
+      }
+    };
 
     fetchNewsData();
+    fetchPublicidad();
   }, []);
 
   return (
@@ -78,11 +92,19 @@ export const HomePage = () => {
       </header>
 
       <main className="w-full px-5 lg:px-10 space-y-10">
-        {/* Banner vacío si lo usas después */}
-        <section className="bg-gradient-to-r from-purple-700 via-purple-600 to-blue-500 rounded-3xl py-32 px-6 flex flex-col items-center gap-10 relative overflow-hidden mb-12">
-          <div className="flex-1 min-w-[180px]" />
-          <div className="flex gap-6 justify-center flex-1 min-w-[180px] relative" />
-        </section>
+        {/* Banner dinámico */}
+        {banner && (
+          <section className="w-full flex justify-center items-center">
+            <img 
+              src={banner}
+              alt="Publicidad"
+              className="rounded-3xl w-full max-h-[400px] object-cover mb-10"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          </section>
+        )}
 
         {/* Noticias principales */}
         {newsData && (
@@ -142,7 +164,6 @@ export const HomePage = () => {
         )}
       </main>
 
-      {/* Footer */}
       <footer className="bg-black py-24 md:py-48 px-4 sm:px-10 mt-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-10 md:gap-0">

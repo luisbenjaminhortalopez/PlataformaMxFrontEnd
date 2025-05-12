@@ -1,2 +1,3 @@
 export * from './apiConfig';
-export * from './newsGlobalService';
+export * from './noticiasGlobalService';
+export * from './publicidadGlobalService';

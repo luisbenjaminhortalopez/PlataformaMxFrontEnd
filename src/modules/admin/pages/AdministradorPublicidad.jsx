@@ -3,11 +3,12 @@ import { AddButton, DeleteConfirmationModal } from "../components";
 import { PublicidadCard } from "../components/PublicidadCard";
 import { FormularioPublicidadModal } from "../components/FormularioPublicidadModal";
 import {
-  obtenerPublicidad,
   eliminarPublicidad,
   agregarPublicidad,
   actualizarPublicidad,
 } from "../services/publicidadService";
+
+import { obtenerPublicidad } from "../../config";
 
 export const AdministradorPublicidad = () => {
   const [publicidades, setPublicidades] = useState([]);

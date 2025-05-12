@@ -1,10 +1,6 @@
 import axios from "axios";
 import { API_BASE } from "../../config";
 
-export const obtenerPublicidad = () => {
-  return axios.get(`${API_BASE}/publicidad/obtener-publicidad`);
-};
-
 export const agregarPublicidad = (data) => {
   const formData = new FormData();
   for (const key in data) {
