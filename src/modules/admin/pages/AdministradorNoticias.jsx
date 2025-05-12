@@ -7,12 +7,15 @@ import {
 } from "../components";
 
 import {
-  obtenerNoticias,
   agregarNoticia,
   actualizarNoticia,
   eliminarNoticia,
-  obtenerDetalleNoticia,
 } from "../services";
+
+import { 
+  obtenerDetalleNoticia,
+  obtenerNoticias 
+} from "../../config";
 
 export const AdministradorNoticias = () => {
   const [noticias, setNoticias] = useState([]);
