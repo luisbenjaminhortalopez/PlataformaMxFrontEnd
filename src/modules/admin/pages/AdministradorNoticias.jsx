@@ -1,35 +1,28 @@
 import { useState, useEffect } from "react";
-import {
-  FormularioNoticiaModal,
-  DeleteConfirmationModal,
-  AddButton,
-  SeccionNoticias
-} from "../components";
-import { useNoticias } from "../hooks";
-
-
-export const MODO_FORM = {
-  AGREGAR: "agregar",
-  EDITAR: "editar"
-};
+import { PageHeader } from "../components/ui/PageHeader";
+import { NoticiasGrid } from "../components/noticias/NoticiasGrid";
+import { FloatingActionButton } from "../components/ui/FloatingActionButton";
+import { NoticiaFormModal } from "../components/noticias/NoticiaFormModal";
+import { ConfirmationModal } from "../components/ui/ConfirmationModal";
+import { useNoticias } from "../hooks/useNoticias";
+import { EmptyState } from "../components/ui/EmptyState";
+import { LoadingState } from "../components/ui/LoadingState";
 
 export const AdministradorNoticias = () => {
-
-  const [formOpen, setFormOpen] = useState(false);
-  const [modoForm, setModoForm] = useState(MODO_FORM.AGREGAR);
-  const [formInitialData, setFormInitialData] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
-
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [formMode, setFormMode] = useState("agregar");
+  const [selectedItem, setSelectedItem] = useState(null);
+  
   const {
     noticias,
-    loading,
     noticiasActivas,
     noticiasVencidas,
+    loading,
     fetchNoticias,
+    obtenerDetalleCompleto,
     agregarNuevaNoticia,
     actualizarNoticiaExistente,
-    obtenerDetalleCompleto,
     eliminarNoticiaById
   } = useNoticias();
 
@@ -37,114 +30,124 @@ export const AdministradorNoticias = () => {
     fetchNoticias();
   }, [fetchNoticias]);
 
-  const openAgregarForm = () => {
-    setModoForm(MODO_FORM.AGREGAR);
-    setFormInitialData(null);
-    setFormOpen(true);
+  const handleOpenCreateForm = () => {
+    setFormMode("agregar");
+    setSelectedItem(null);
+    setFormModalOpen(true);
   };
 
-  const openEditarForm = async (noticiaResumen) => {
+  const handleOpenEditForm = async (item) => {
     try {
-      const detalleNoticia = await obtenerDetalleCompleto(noticiaResumen.id);
-      setModoForm(MODO_FORM.EDITAR);
-      setFormInitialData(detalleNoticia);
-      setFormOpen(true);
+      const detalleNoticia = await obtenerDetalleCompleto(item.id);
+      setFormMode("editar");
+      setSelectedItem(detalleNoticia);
+      setFormModalOpen(true);
     } catch (err) {
       console.error("Error al obtener detalle de la noticia:", err);
     }
   };
 
-  const handleSubmit = async (data) => {
+  const handleSubmitForm = async (data) => {
     try {
-      if (modoForm === MODO_FORM.AGREGAR) {
+      if (formMode === "agregar") {
         await agregarNuevaNoticia(data);
       } else {
         await actualizarNoticiaExistente(data);
       }
-      setFormOpen(false);
+      setFormModalOpen(false);
     } catch (error) {
-      console.error("Error al guardar noticia:", error);
+      console.error("Error al procesar noticia:", error);
     }
   };
 
-  const handleDeleteClick = (id) => {
-    setSelectedId(id);
+  const handleRequestDelete = (id) => {
+    setSelectedItem({ id });
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = async () => {
+  const handleConfirmDelete = async () => {
     try {
-      await eliminarNoticiaById(selectedId);
+      await eliminarNoticiaById(selectedItem.id);
+      setShowDeleteModal(false);
+      setSelectedItem(null);
     } catch (error) {
       console.error("Error al eliminar noticia:", error);
-    } finally {
-      closeDeleteModal();
     }
   };
 
-  const closeDeleteModal = () => {
-    setShowDeleteModal(false);
-    setSelectedId(null);
+  const renderContent = () => {
+    if (loading) {
+      return <LoadingState message="Cargando noticias..." />;
+    }
+    
+    if (noticias.length === 0) {
+      return (
+        <EmptyState 
+          title="No hay noticias" 
+          message="Todavía no hay noticias registradas." 
+          actionLabel="Crear noticia"
+          onAction={handleOpenCreateForm}
+        />
+      );
+    }
+    
+    return (
+      <div className="space-y-12">
+        {noticiasActivas.length > 0 && (
+          <NoticiasGrid 
+            title="Noticias Activas"
+            badge={{ label: "Activas", color: "green" }}
+            items={noticiasActivas}
+            onEdit={handleOpenEditForm}
+            onDelete={handleRequestDelete}
+          />
+        )}
+        
+        {noticiasVencidas.length > 0 && (
+          <NoticiasGrid 
+            title="Noticias Vencidas"
+            badge={{ label: "Vencidas", color: "red" }}
+            items={noticiasVencidas}
+            onEdit={handleOpenEditForm}
+            onDelete={handleRequestDelete}
+          />
+        )}
+      </div>
+    );
   };
 
   return (
-    <div className="relative p-10 w-full min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">ADMINISTRAR NOTICIAS</h1>
-
-      {renderContenido(loading, noticias, noticiasActivas, noticiasVencidas, openEditarForm, handleDeleteClick)}
-
-      <AddButton onClick={openAgregarForm} />
-
-      <FormularioNoticiaModal
-        isOpen={formOpen}
-        modo={modoForm}
-        initialData={formInitialData}
-        onClose={() => setFormOpen(false)}
-        onSubmit={handleSubmit}
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <PageHeader 
+        title="Administrar Noticias"
+        description="Gestiona las noticias y artículos de tu plataforma"
+      />
+      
+      {renderContent()}
+      
+      <FloatingActionButton 
+        onClick={handleOpenCreateForm} 
+        label="Crear noticia"
       />
 
-      <DeleteConfirmationModal
+      <NoticiaFormModal
+        isOpen={formModalOpen}
+        modo={formMode}
+        initialData={selectedItem}
+        onClose={() => setFormModalOpen(false)}
+        onSubmit={handleSubmitForm}
+      />
+
+      <ConfirmationModal
         isOpen={showDeleteModal}
-        onCancel={closeDeleteModal}
-        onConfirm={confirmDelete}
+        title="Eliminar Noticia"
+        message="¿Estás seguro de que deseas eliminar esta noticia? Esta acción no se puede deshacer."
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteModal(false)}
+        danger
       />
     </div>
-  );
-};
-
-const renderContenido = (loading, noticias, noticiasActivas, noticiasVencidas, onEdit, onDelete) => {
-  if (loading) {
-    return <p className="text-center text-gray-500 mt-10">Cargando noticias...</p>;
-  }
-  
-  if (noticias.length === 0) {
-    return (
-      <p className="text-center text-gray-400 mt-10 italic">
-        Todavía no hay noticias registradas.
-      </p>
-    );
-  }
-  
-  return (
-    <>
-      {noticiasActivas.length > 0 && (
-        <SeccionNoticias
-          titulo="🟢 Noticias Activas"
-          noticias={noticiasActivas}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          className="mb-10"
-        />
-      )}
-
-      {noticiasVencidas.length > 0 && (
-        <SeccionNoticias
-          titulo="🔴 Noticias Vencidas"
-          noticias={noticiasVencidas}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
-      )}
-    </>
   );
 };

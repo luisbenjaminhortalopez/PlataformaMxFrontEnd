@@ -1,127 +1,128 @@
 import { useState, useEffect } from "react";
-import { AddButton, DeleteConfirmationModal } from "../components";
-import { PublicidadCard } from "../components/PublicidadCard";
-import { FormularioPublicidadModal } from "../components/FormularioPublicidadModal";
-import {
-  eliminarPublicidad,
-  agregarPublicidad,
-  actualizarPublicidad,
-} from "../services/publicidadService";
-
-import { obtenerPublicidad } from "../../config";
+import { PageHeader } from "../components/ui/PageHeader";
+import { PublicidadGrid } from "../components/publicidad/PublicidadGrid";
+import { FloatingActionButton } from "../components/ui/FloatingActionButton";
+import { PublicidadFormModal } from "../components/publicidad/PublicidadFormModal";
+import { ConfirmationModal } from "../components/ui/ConfirmationModal";
+import { usePublicidad } from "../hooks/usePublicidad";
+import { EmptyState } from "../components/ui/EmptyState";
+import { LoadingState } from "../components/ui/LoadingState";
 
 export const AdministradorPublicidad = () => {
-  const [publicidades, setPublicidades] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedId, setSelectedId] = useState(null);
-  const [formOpen, setFormOpen] = useState(false);
-  const [modoForm, setModoForm] = useState("agregar");
-  const [formInitialData, setFormInitialData] = useState(null);
-
-  const fetchPublicidad = async () => {
-    try {
-      const { data } = await obtenerPublicidad();
-      const formateadas = data.map((item) => ({
-        id: item.id,
-        imagen: item.imagen,
-        nombre_anunciante: item.nombre_anunciante,
-        fecha_expiracion: item.fecha_expiracion,
-      }));
-      setPublicidades(formateadas);
-    } catch (error) {
-      console.error("Error al obtener publicidad:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [formMode, setFormMode] = useState("agregar");
+  const [selectedItem, setSelectedItem] = useState(null);
+  
+  const {
+    publicidades,
+    loading,
+    fetchPublicidad,
+    agregarNuevaPublicidad,
+    actualizarPublicidadExistente,
+    eliminarPublicidadPorId
+  } = usePublicidad();
 
   useEffect(() => {
     fetchPublicidad();
   }, []);
 
-  const openAgregarForm = () => {
-    setModoForm("agregar");
-    setFormInitialData(null);
-    setFormOpen(true);
+  const handleOpenCreateForm = () => {
+    setFormMode("agregar");
+    setSelectedItem(null);
+    setFormModalOpen(true);
   };
 
-  const openEditarForm = (data) => {
-    setModoForm("editar");
-    setFormInitialData(data);
-    setFormOpen(true);
+  const handleOpenEditForm = (item) => {
+    setFormMode("editar");
+    setSelectedItem(item);
+    setFormModalOpen(true);
   };
 
-  const handleSubmit = async (data) => {
+  const handleSubmitForm = async (data) => {
     try {
-      if (modoForm === "agregar") {
-        await agregarPublicidad(data);
+      if (formMode === "agregar") {
+        await agregarNuevaPublicidad(data);
       } else {
-        await actualizarPublicidad(data.id, data);
+        await actualizarPublicidadExistente(data.id, data);
       }
-      fetchPublicidad();
+      setFormModalOpen(false);
     } catch (error) {
-      console.error("Error al guardar publicidad:", error);
+      console.error("Error al procesar publicidad:", error);
     }
   };
 
-  const handleDeleteClick = (id) => {
-    setSelectedId(id);
+  const handleRequestDelete = (id) => {
+    setSelectedItem({ id });
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = async () => {
+  const handleConfirmDelete = async () => {
     try {
-      await eliminarPublicidad(selectedId);
-      setPublicidades(publicidades.filter((p) => p.id !== selectedId));
+      await eliminarPublicidadPorId(selectedItem.id);
+      setShowDeleteModal(false);
+      setSelectedItem(null);
     } catch (error) {
       console.error("Error al eliminar publicidad:", error);
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedId(null);
     }
   };
 
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setSelectedId(null);
+  const renderContent = () => {
+    if (loading) {
+      return <LoadingState message="Cargando publicidades..." />;
+    }
+    
+    if (publicidades.length === 0) {
+      return (
+        <EmptyState 
+          title="No hay publicidades" 
+          message="Todavía no hay publicidades registradas." 
+          actionLabel="Agregar publicidad"
+          onAction={handleOpenCreateForm}
+        />
+      );
+    }
+    
+    return (
+      <PublicidadGrid 
+        items={publicidades}
+        onEdit={handleOpenEditForm}
+        onDelete={handleRequestDelete}
+      />
+    );
   };
 
   return (
-    <div className="relative p-10 w-full min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">ADMINISTRAR PUBLICIDAD</h1>
-
-      {loading ? (
-        <p className="text-center text-gray-500 mt-10">Cargando publicidades...</p>
-      ) : publicidades.length === 0 ? (
-        <p className="text-center text-gray-400 mt-10 italic">
-          Todavía no hay publicidades registradas.
-        </p>
-      ) : (
-        publicidades.map((p) => (
-          <PublicidadCard
-            key={p.id}
-            image={p.imagen}
-            onEdit={() => openEditarForm(p)}
-            onDelete={() => handleDeleteClick(p.id)}
-          />
-        ))
-      )}
-
-      <AddButton onClick={openAgregarForm} />
-
-      <FormularioPublicidadModal
-        isOpen={formOpen}
-        modo={modoForm}
-        initialData={formInitialData}
-        onClose={() => setFormOpen(false)}
-        onSubmit={handleSubmit}
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <PageHeader 
+        title="Administrar Publicidad"
+        description="Gestiona los anuncios publicitarios de tu plataforma"
+      />
+      
+      {renderContent()}
+      
+      <FloatingActionButton 
+        onClick={handleOpenCreateForm} 
+        label="Agregar publicidad"
       />
 
-      <DeleteConfirmationModal
+      <PublicidadFormModal
+        isOpen={formModalOpen}
+        modo={formMode}
+        initialData={selectedItem}
+        onClose={() => setFormModalOpen(false)}
+        onSubmit={handleSubmitForm}
+      />
+
+      <ConfirmationModal
         isOpen={showDeleteModal}
-        onCancel={cancelDelete}
-        onConfirm={confirmDelete}
+        title="Eliminar Publicidad"
+        message="¿Estás seguro de que deseas eliminar esta publicidad? Esta acción no se puede deshacer."
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteModal(false)}
+        danger
       />
     </div>
   );
