@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { 
   eliminarPublicidad, 
   agregarPublicidad, 
@@ -46,10 +46,27 @@ export const usePublicidad = () => {
     }
   };
 
-  const actualizarPublicidadExistente = async (id, data) => {
+  const actualizarPublicidadExistente = async (data) => {
     try {
-      const respuesta = await actualizarPublicidad(id, data);
-      await fetchPublicidad();
+      const respuesta = await actualizarPublicidad(data.id, data);
+      if (respuesta?.data?.imagenUrl) {
+        console.log(respuesta);
+        setPublicidades(prev => 
+          prev.map(item => 
+            item.id === data.id 
+              ? {
+                  ...item,
+                  imagen: respuesta.data.imagenUrl,
+                  nombre_anunciante: data.nombre_anunciante,
+                  fecha_expiracion: data.fecha_expiracion
+                }
+              : item
+          )
+        );
+      } else {
+        await fetchPublicidad();
+      }
+      
       return respuesta;
     } catch (err) {
       setError("Error al actualizar publicidad");
@@ -69,11 +86,6 @@ export const usePublicidad = () => {
       throw err;
     }
   };
-
-  useEffect(() => {
-    // No llamamos fetchPublicidad aquí para evitar que se cargue automáticamente
-    // y dar control al componente sobre cuándo hacer la primera carga
-  }, []);
 
   return {
     publicidades,

@@ -2,8 +2,8 @@ import { memo } from 'react';
 
 export const SecondaryNews = memo(({ image, description, onClick }) => {
   return (
-    <article className="bg-black rounded-3xl overflow-hidden relative w-[340px] mx-auto">
-      <div className="w-full h-80 overflow-hidden cursor-pointer" onClick={onClick}>
+    <article className="bg-black rounded-3xl overflow-hidden relative w-full sm:w-[340px] lg:w-full mx-auto h-[320px]">
+      <div className="w-full h-full overflow-hidden cursor-pointer" onClick={onClick}>
         <img
           className="w-full h-full object-cover rounded-3xl hover:scale-110 transition-transform duration-300"
           src={image}

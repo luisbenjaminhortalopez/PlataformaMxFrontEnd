@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import logo from "../../../assets/Logo.svg";
+import logo from "../../../assets/logodos.png";
 import { useNewsData, useAdvertisement } from "../hooks";
 import { Header, Footer, Banner, MainNews, SecondaryNews, MoreNewsCard } from "../components";
 
@@ -22,39 +22,52 @@ export const HomePage = () => {
       return <div className="text-center text-red-500 py-10">Error: {error}</div>;
     }
 
-    if (!newsData || !newsData.slide) {
+    if (!newsData || !newsData.slide || newsData.slide.length === 0) {
       return <div className="text-center py-10">No hay noticias disponibles</div>;
     }
 
     return (
-      <section className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr_1fr] gap-8 lg:gap-14">
-        <div className="space-y-8">
-          {newsData.secondNews.slice(0, 2).map((news) => (
-            <SecondaryNews
-              key={news.id}
-              image={news.image}
-              description={news.description}
-              onClick={() => handleNewsClick(news.id)}
-            />
-          ))}
+      <>
+        <div className="lg:hidden w-full mb-8 h-[320px]">
+          <MainNews
+            slides={newsData.slide}
+            onNewsClick={(id) => handleNewsClick(id)}
+          />
         </div>
+        
+        <section className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr_1fr] gap-8 lg:gap-14 items-start max-w-7xl mx-auto">
+          <div className="space-y-8">
+            {newsData.secondNews.slice(0, 2).map((news) => (
+              <SecondaryNews
+                key={news.id}
+                image={news.image}
+                description={news.description}
+                onClick={() => handleNewsClick(news.id)}
+              />
+            ))}
+          </div>
 
-        <MainNews
-          slides={[newsData.slide]}
-          onNewsClick={(id) => handleNewsClick(id)}
-        />
+          <div className="hidden lg:block h-full">
+            <div className="h-full flex">
+              <MainNews
+                slides={newsData.slide}
+                onNewsClick={(id) => handleNewsClick(id)}
+              />
+            </div>
+          </div>
 
-        <div className="space-y-8">
-          {newsData.secondNews.slice(2).map((news) => (
-            <SecondaryNews
-              key={news.id}
-              image={news.image}
-              description={news.description}
-              onClick={() => handleNewsClick(news.id)}
-            />
-          ))}
-        </div>
-      </section>
+          <div className="space-y-8">
+            {newsData.secondNews.slice(2).map((news) => (
+              <SecondaryNews
+                key={news.id}
+                image={news.image}
+                description={news.description}
+                onClick={() => handleNewsClick(news.id)}
+              />
+            ))}
+          </div>
+        </section>
+      </>
     );
   };
 
@@ -64,7 +77,7 @@ export const HomePage = () => {
     }
 
     return (
-      <section className="mt-12 lg:mt-20 mb-16 lg:mb-28 px-4 sm:px-0">
+      <section className="mt-12 lg:mt-20 mb-16 lg:mb-28 px-4 sm:px-0 max-w-7xl mx-auto">
         <h2 className="text-black text-3xl sm:text-4xl lg:text-6xl font-semibold mb-6 lg:mb-10 select-none">
           Más Noticias
         </h2>
@@ -85,16 +98,18 @@ export const HomePage = () => {
   };
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header logo={logo} />
 
-      <main className="w-full px-5 lg:px-10 space-y-10">
-        <Banner imageUrl={banner} />
+      <main className="w-full px-5 lg:px-10 space-y-10 flex-grow">
+        <div className="max-w-7xl mx-auto">
+          <Banner imageUrl={banner} />
+        </div>
         {renderMainSection()}
         {renderMoreNews()}
       </main>
 
       <Footer logo={logo} />
-    </>
+    </div>
   );
 };

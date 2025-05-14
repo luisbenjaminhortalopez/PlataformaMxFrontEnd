@@ -5,14 +5,14 @@ import {
   ConfirmationModal, 
   EmptyState, 
   LoadingState 
-} from "../components/ui/PageHeader";
+} from "../components";
 
 import { 
   PublicidadGrid, 
   PublicidadFormModal
-} from "../components/publicidad/PublicidadGrid";
+} from "../components";
 
-import { usePublicidad } from "../hooks/usePublicidad";
+import { usePublicidad } from "../hooks";
 
 export const AdministradorPublicidad = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -31,7 +31,7 @@ export const AdministradorPublicidad = () => {
 
   useEffect(() => {
     fetchPublicidad();
-  }, []);
+  }, [fetchPublicidad]);
 
   const handleOpenCreateForm = () => {
     setFormMode("agregar");
@@ -50,7 +50,7 @@ export const AdministradorPublicidad = () => {
       if (formMode === "agregar") {
         await agregarNuevaPublicidad(data);
       } else {
-        await actualizarPublicidadExistente(data.id, data);
+        await actualizarPublicidadExistente(data);
       }
       setFormModalOpen(false);
     } catch (error) {

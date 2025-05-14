@@ -3,7 +3,7 @@ import { obtenerNoticias } from '../../config';
 
 export const useNewsData = () => {
   const [newsData, setNewsData] = useState({
-    slide: null,
+    slide: [],
     secondNews: [],
     more: []
   });
@@ -34,23 +34,26 @@ export const useNewsData = () => {
 
         if (validNews.length === 0) {
           setNewsData({
-            slide: null,
+            slide: [],
             secondNews: [],
             more: []
           });
           return;
         }
 
-        const principal = validNews[0];
-        const siguientes = validNews.length > 1 ? validNews.slice(1, Math.min(5, validNews.length)) : [];
-        const restantes = validNews.length > 5 ? validNews.slice(5) : [];
+        const principalNews = validNews.slice(0, Math.min(5, validNews.length));
+        
+        const siguientes = validNews.length > 5 ? 
+          validNews.slice(5, Math.min(9, validNews.length)) : [];
+        
+        const restantes = validNews.length > 9 ? validNews.slice(9) : [];
 
         setNewsData({
-          slide: {
-            id: principal.id,
-            image: principal.imagen_portada,
-            title: principal.titulo,
-          },
+          slide: principalNews.map((n) => ({
+            id: n.id,
+            image: n.imagen_portada,
+            title: n.titulo,
+          })),
           secondNews: siguientes.map((n) => ({
             id: n.id,
             image: n.imagen_portada,

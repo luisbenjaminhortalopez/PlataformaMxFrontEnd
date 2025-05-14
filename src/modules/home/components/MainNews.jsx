@@ -1,10 +1,13 @@
-import { useState, useCallback, memo } from 'react';
+import { useState, useCallback, memo, useEffect, useRef } from 'react';
 
 export const MainNews = memo(({ slides, onNewsClick }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const autoplayTimerRef = useRef(null);
+  
+  const AUTOPLAY_INTERVAL = 5000;
   
   const handleNewsClick = useCallback(() => {
-    if (slides && slides.length > 0) {
+    if (slides && slides.length > 0 && typeof onNewsClick === 'function') {
       onNewsClick(slides[currentSlide].id);
     }
   }, [slides, currentSlide, onNewsClick]);
@@ -21,22 +24,49 @@ export const MainNews = memo(({ slides, onNewsClick }) => {
     }
   }, [slides]);
   
+  useEffect(() => {
+    if (slides && slides.length > 1) {
+      autoplayTimerRef.current = setInterval(() => {
+        nextSlide();
+      }, AUTOPLAY_INTERVAL);
+      
+      return () => {
+        if (autoplayTimerRef.current) {
+          clearInterval(autoplayTimerRef.current);
+        }
+      };
+    }
+  }, [slides, nextSlide]);
+  
+  
+  const pauseAutoplay = useCallback(() => {
+    if (autoplayTimerRef.current) {
+      clearInterval(autoplayTimerRef.current);
+      
+      autoplayTimerRef.current = setTimeout(() => {
+        autoplayTimerRef.current = setInterval(() => {
+          nextSlide();
+        }, AUTOPLAY_INTERVAL);
+      }, AUTOPLAY_INTERVAL * 2);
+    }
+  }, [nextSlide]);
+  
   if (!slides || slides.length === 0) {
     return (
-      <article className="bg-black rounded-3xl overflow-hidden relative h-[500px] lg:h-[700px] flex items-center justify-center">
+      <article className="bg-black rounded-3xl overflow-hidden relative h-full w-full flex items-center justify-center">
         <p className="text-white text-xl">No hay noticias disponibles</p>
       </article>
     );
   }
   
   return (
-    <article className="bg-black rounded-3xl overflow-hidden relative h-[500px] lg:h-[700px]">
-      <div
-        className="w-full h-full overflow-hidden cursor-pointer"
-        onClick={handleNewsClick}
-      >
+    <article 
+      className="bg-black rounded-3xl overflow-hidden relative h-[320px] lg:h-full w-full cursor-pointer"
+      onClick={handleNewsClick}
+    >
+      <div className="w-full h-full overflow-hidden">
         <img
-          className="w-full h-full object-cover rounded-3xl hover:scale-110 transition-transform duration-300"
+          className="w-full h-full object-cover rounded-3xl hover:scale-105 transition-transform duration-300"
           src={slides[currentSlide].image}
           alt={slides[currentSlide].title}
           onError={(e) => {
@@ -45,8 +75,7 @@ export const MainNews = memo(({ slides, onNewsClick }) => {
         />
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-
+      <div className="absolute bottom-0 left-0 right-0 h-full bg-gradient-to-t from-black via-black/50 to-transparent opacity-70" />
       <div className="absolute bottom-11 left-0 right-16 px-6 z-10">
         <p className="text-white text-xl lg:text-2xl font-bold drop-shadow-2xl leading-tight">
           {slides[currentSlide].title}
@@ -57,18 +86,26 @@ export const MainNews = memo(({ slides, onNewsClick }) => {
         <>
           <div className="absolute bottom-4 right-3 flex space-x-3 z-20">
             <button
-              onClick={prevSlide}
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-lg w-12 h-12 flex items-center justify-center transition-all border border-white/20 hover:border-white/40"
+              onClick={(e) => {
+                e.stopPropagation();
+                prevSlide();
+                pauseAutoplay();
+              }}
+              className="text-white text-2xl hover:text-gray-300 transition-colors"
               aria-label="Previous slide"
             >
-              <span className="text-white text-2xl font-bold">&lt;</span>
+              <i className="fas fa-chevron-left"></i>
             </button>
             <button
-              onClick={nextSlide}
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-lg w-12 h-12 flex items-center justify-center transition-all border border-white/20 hover:border-white/40"
+              onClick={(e) => {
+                e.stopPropagation();
+                nextSlide();
+                pauseAutoplay();
+              }}
+              className="text-white text-2xl hover:text-gray-300 transition-colors"
               aria-label="Next slide"
             >
-              <span className="text-white text-2xl font-bold">&gt;</span>
+              <i className="fas fa-chevron-right"></i>
             </button>
           </div>
 
@@ -76,7 +113,11 @@ export const MainNews = memo(({ slides, onNewsClick }) => {
             {slides.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setCurrentSlide(index)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentSlide(index);
+                  pauseAutoplay();
+                }}
                 className={`w-3 h-3 rounded-full transition-all ${
                   currentSlide === index ? "bg-white" : "bg-white/30"
                 }`}

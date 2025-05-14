@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import Logo from '../../../assets/Logo.svg';
+import Logo from '../../../assets/logodos.png';
 import { HamburguerButton } from './HamburgerButton';
 
 export const Sidebar = ({ toggleSidebar }) => {

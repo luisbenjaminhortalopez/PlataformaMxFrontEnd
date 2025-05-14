@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
-import { PageHeader } from "../components/ui/PageHeader";
-import { NoticiasGrid } from "../components/noticias/NoticiasGrid";
-import { FloatingActionButton } from "../components/ui/FloatingActionButton";
-import { NoticiaFormModal } from "../components/noticias/NoticiaFormModal";
-import { ConfirmationModal } from "../components/ui/ConfirmationModal";
-import { useNoticias } from "../hooks/useNoticias";
-import { EmptyState } from "../components/ui/EmptyState";
-import { LoadingState } from "../components/ui/LoadingState";
+import { 
+  PageHeader, 
+  FloatingActionButton, 
+  ConfirmationModal, 
+  EmptyState, 
+  LoadingState
+} from "../components";
+
+import { 
+  NoticiasGrid, 
+  NoticiaFormModal 
+} from "../components";
+
+import { useNoticias } from "../hooks";
 
 export const AdministradorNoticias = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);

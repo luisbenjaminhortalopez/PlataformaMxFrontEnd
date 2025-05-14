@@ -1,16 +1,18 @@
 
 import { useState, useCallback } from "react";
+
 import {
   agregarNoticia,
   actualizarNoticia,
   eliminarNoticia,
 } from "../services";
+
 import {
   obtenerDetalleNoticia,
   obtenerNoticias
 } from "../../config";
-import { formatearFecha } from "../utils";
-import { formatearListadoNoticias, ordenarNoticiasPorFecha } from "../utils";
+
+import { formatearListadoNoticias, ordenarNoticiasPorFecha, formatearFecha } from "../utils";
 
 
 export const useNoticias = () => {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { X, Upload, Calendar, User } from "lucide-react";
+import { X, Upload, Calendar, User, Loader } from "lucide-react";
 
 export const PublicidadFormModal = ({
   isOpen,
@@ -19,6 +19,7 @@ export const PublicidadFormModal = ({
   const [previewURL, setPreviewURL] = useState(null);
   const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -36,6 +37,7 @@ export const PublicidadFormModal = ({
       setPreviewURL(null);
     }
     setError("");
+    setIsSubmitting(false);
   }, [isOpen, initialData, modo]);
 
   const handleChange = (e) => {
@@ -77,7 +79,9 @@ export const PublicidadFormModal = ({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
     if (!form.nombre_anunciante.trim()) {
       setError("El nombre del anunciante es obligatorio.");
       return;
@@ -92,7 +96,23 @@ export const PublicidadFormModal = ({
     }
 
     setError("");
-    onSubmit({ ...form });
+    setIsSubmitting(true);
+    
+    try {
+      if (modo === "editar" && !form.file && initialData.imagen) {
+        await onSubmit({
+          ...form,
+          imagen_url: initialData.imagen
+        });
+      } else {
+        await onSubmit({ ...form });
+      }
+    } catch (err) {
+      console.error("Error al enviar el formulario:", err);
+      setError("Ha ocurrido un error al guardar la publicidad");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const calculateMinDate = () => {
@@ -117,6 +137,7 @@ export const PublicidadFormModal = ({
           <button 
             onClick={onClose}
             className="p-1 rounded-full hover:bg-zinc-700 transition-colors"
+            disabled={isSubmitting}
           >
             <X size={20} />
           </button>
@@ -135,6 +156,7 @@ export const PublicidadFormModal = ({
               onChange={handleChange}
               className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 focus:border-zinc-400 focus:ring-1 focus:ring-blue-500 outline-none transition"
               placeholder="Nombre del anunciante"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -150,6 +172,7 @@ export const PublicidadFormModal = ({
               min={calculateMinDate()}
               onChange={handleChange}
               className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 focus:border-zinc-400 focus:ring-1 focus:ring-blue-500 outline-none transition"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -174,6 +197,7 @@ export const PublicidadFormModal = ({
                 accept="image/*"
                 onChange={handleChange}
                 className="hidden"
+                disabled={isSubmitting}
               />
               
               {!previewURL ? (
@@ -185,6 +209,7 @@ export const PublicidadFormModal = ({
                       type="button"
                       onClick={() => document.getElementById("filePublicidad").click()}
                       className="text-blue-500 hover:text-blue-400 focus:outline-none"
+                      disabled={isSubmitting}
                     >
                       haz clic para seleccionar
                     </button>
@@ -207,6 +232,7 @@ export const PublicidadFormModal = ({
                       setForm((prev) => ({ ...prev, file: null }));
                     }}
                     className="absolute top-1 right-1 p-1 bg-red-600 rounded-full hover:bg-red-700 transition-colors"
+                    disabled={isSubmitting}
                   >
                     <X size={16} />
                   </button>
@@ -235,13 +261,24 @@ export const PublicidadFormModal = ({
           <div className="flex gap-3 pt-4">
             <button
               onClick={handleSubmit}
-              className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 font-medium rounded transition-colors"
+              className={`flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 font-medium rounded transition-colors flex items-center justify-center ${
+                isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+              }`}
+              disabled={isSubmitting}
             >
-              {modo === "agregar" ? "Subir Publicidad" : "Actualizar Publicidad"}
+              {isSubmitting ? (
+                <>
+                  <Loader size={18} className="animate-spin mr-2" />
+                  {modo === "agregar" ? "Subiendo..." : "Actualizando..."}
+                </>
+              ) : (
+                modo === "agregar" ? "Subir Publicidad" : "Actualizar Publicidad"
+              )}
             </button>
             <button
               onClick={onClose}
               className="py-3 px-4 bg-zinc-700 hover:bg-gray-700 rounded transition-colors"
+              disabled={isSubmitting}
             >
               Cancelar
             </button>

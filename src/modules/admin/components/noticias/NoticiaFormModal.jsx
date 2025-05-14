@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { X, Upload, Calendar, User, FileType, Layers } from "lucide-react";
+import { X, Upload, Calendar, User, FileType, Layers, Loader } from "lucide-react";
 import { obtenerCategorias } from "../../services";
 
 export const NoticiaFormModal = ({
@@ -32,6 +32,7 @@ export const NoticiaFormModal = ({
   
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchCategorias = async () => {
@@ -94,6 +95,7 @@ export const NoticiaFormModal = ({
       });
     }
     setError("");
+    setIsSubmitting(false);
   }, [isOpen, initialData, modo]);
 
   const handleChange = (e) => {
@@ -107,7 +109,6 @@ export const NoticiaFormModal = ({
   };
 
   const handleFileChange = (fieldName, file) => {
-    // Validar tamaño del archivo (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setError(`El archivo ${file.name} es demasiado grande. Máximo 5MB permitido.`);
       return;
@@ -139,7 +140,9 @@ export const NoticiaFormModal = ({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
     if (!form.titulo.trim()) {
       setError("El título es obligatorio");
       return;
@@ -192,7 +195,16 @@ export const NoticiaFormModal = ({
     }
 
     setError("");
-    onSubmit(formData);
+    setIsSubmitting(true);
+    
+    try {
+      await onSubmit(formData);
+    } catch (err) {
+      console.error("Error al enviar el formulario:", err);
+      setError("Ha ocurrido un error al guardar la noticia");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderFileUpload = (fieldName, label, required = true) => {
@@ -295,6 +307,7 @@ export const NoticiaFormModal = ({
           <button 
             onClick={onClose}
             className="p-1 rounded-full hover:bg-zinc-700 transition-colors"
+            disabled={isSubmitting}
           >
             <X size={20} />
           </button>
@@ -314,6 +327,7 @@ export const NoticiaFormModal = ({
                 onChange={handleChange}
                 className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 focus:border-zinc-400 focus:ring-1 focus:ring-blue-500 outline-none transition"
                 placeholder="Título de la noticia"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -329,6 +343,7 @@ export const NoticiaFormModal = ({
                 onChange={handleChange}
                 className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 focus:border-zinc-400 focus:ring-1 focus:ring-blue-500 outline-none transition"
                 placeholder="Nombre del autor"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -344,6 +359,7 @@ export const NoticiaFormModal = ({
                   value={form.fecha_publicacion}
                   onChange={handleChange}
                   className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 focus:border-zinc-400 focus:ring-1 focus:ring-blue-500 outline-none transition"
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -359,6 +375,7 @@ export const NoticiaFormModal = ({
                   min={calculateMinDate()}
                   onChange={handleChange}
                   className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 focus:border-zinc-400 focus:ring-1 focus:ring-blue-500 outline-none transition"
+                  disabled={isSubmitting}
                 />
               </div>
             </div>
@@ -373,6 +390,7 @@ export const NoticiaFormModal = ({
                 value={form.categoria_id}
                 onChange={handleChange}
                 className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 focus:border-zinc-400 focus:ring-1 focus:ring-blue-500 outline-none transition"
+                disabled={isSubmitting}
               >
                 <option value="">Selecciona una categoría</option>
                 {categorias.map((cat) => (
@@ -399,6 +417,7 @@ export const NoticiaFormModal = ({
                 rows={4}
                 className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 focus:border-zinc-400 focus:ring-1 focus:ring-blue-500 outline-none transition"
                 placeholder="Contenido de la primera sección"
+                disabled={isSubmitting}
               />
             </div>
             
@@ -416,6 +435,7 @@ export const NoticiaFormModal = ({
                 rows={4}
                 className="w-full p-3 rounded bg-zinc-700 border border-zinc-600 focus:border-zinc-400 focus:ring-1 focus:ring-blue-500 outline-none transition"
                 placeholder="Contenido de la segunda sección (opcional)"
+                disabled={isSubmitting}
               />
             </div>
             
@@ -432,13 +452,24 @@ export const NoticiaFormModal = ({
         <div className="flex flex-col sm:flex-row gap-3 mt-6">
           <button
             onClick={handleSubmit}
-            className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 font-medium rounded transition-colors"
+            className={`flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 font-medium rounded transition-colors flex items-center justify-center ${
+              isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+            disabled={isSubmitting}
           >
-            {modo === "agregar" ? "Crear Noticia" : "Actualizar Noticia"}
+            {isSubmitting ? (
+              <>
+                <Loader size={18} className="animate-spin mr-2" />
+                {modo === "agregar" ? "Creando..." : "Actualizando..."}
+              </>
+            ) : (
+              modo === "agregar" ? "Crear Noticia" : "Actualizar Noticia"
+            )}
           </button>
           <button
             onClick={onClose}
             className="py-3 px-4 bg-zinc-700 hover:bg-gray-700 rounded transition-colors"
+            disabled={isSubmitting}
           >
             Cancelar
           </button>
