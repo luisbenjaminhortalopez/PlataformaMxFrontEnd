@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router';
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import logo from '../../../assets/Logo.svg';
+import logo from '../../../assets/logodos.png';
 import { useNewsDetails, useRelatedNews, useAdvertisement } from '../hooks';
 import { Header, Footer, Banner } from '../components';
 
