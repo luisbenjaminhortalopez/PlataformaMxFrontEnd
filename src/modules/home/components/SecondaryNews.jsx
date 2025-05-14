@@ -1,4 +1,6 @@
-export const SecondNew = ({ image, description, onClick }) => {
+import { memo } from 'react';
+
+export const SecondaryNews = memo(({ image, description, onClick }) => {
   return (
     <article className="bg-black rounded-3xl overflow-hidden relative w-[340px] mx-auto">
       <div className="w-full h-80 overflow-hidden cursor-pointer" onClick={onClick}>
@@ -6,6 +8,9 @@ export const SecondNew = ({ image, description, onClick }) => {
           className="w-full h-full object-cover rounded-3xl hover:scale-110 transition-transform duration-300"
           src={image}
           alt={description}
+          onError={(e) => {
+            e.target.src = "https://via.placeholder.com/340x320?text=Imagen+no+disponible";
+          }}
         />
       </div>
       <p className="text-white text-xl p-4 absolute bottom-0 left-0 right-0 bg-black/50 leading-tight">
@@ -13,4 +18,4 @@ export const SecondNew = ({ image, description, onClick }) => {
       </p>
     </article>
   );
-};
+});

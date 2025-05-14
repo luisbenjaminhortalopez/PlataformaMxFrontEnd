@@ -1,4 +1,6 @@
-export * from "./MainNew";
-export * from "./SecondNew";
-export * from "./MoreNewsCard";
-
+export * from './Banner';
+export * from './Footer';
+export * from './Header';
+export * from './MainNews';
+export * from './MoreNewsCard';
+export * from './SecondaryNews';

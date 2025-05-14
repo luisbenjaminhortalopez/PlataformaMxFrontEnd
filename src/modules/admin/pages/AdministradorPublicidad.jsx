@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
-import { PageHeader } from "../components/ui/PageHeader";
-import { PublicidadGrid } from "../components/publicidad/PublicidadGrid";
-import { FloatingActionButton } from "../components/ui/FloatingActionButton";
-import { PublicidadFormModal } from "../components/publicidad/PublicidadFormModal";
-import { ConfirmationModal } from "../components/ui/ConfirmationModal";
+import { 
+  PageHeader, 
+  FloatingActionButton, 
+  ConfirmationModal, 
+  EmptyState, 
+  LoadingState 
+} from "../components/ui/PageHeader";
+
+import { 
+  PublicidadGrid, 
+  PublicidadFormModal
+} from "../components/publicidad/PublicidadGrid";
+
 import { usePublicidad } from "../hooks/usePublicidad";
-import { EmptyState } from "../components/ui/EmptyState";
-import { LoadingState } from "../components/ui/LoadingState";
 
 export const AdministradorPublicidad = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);

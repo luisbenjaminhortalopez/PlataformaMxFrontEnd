@@ -1,7 +1,6 @@
 import { useState } from "react"; 
 import { Outlet } from "react-router"; 
-import { Sidebar } from "../components"; 
-import { HamburguerButton } from "../components"; 
+import { Sidebar, HamburguerButton } from "../components"; 
  
 export const AdminPage = () => { 
   const [sidebarOpen, setSidebarOpen] = useState(true); 

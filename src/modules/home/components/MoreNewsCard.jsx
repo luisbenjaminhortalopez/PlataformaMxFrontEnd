@@ -1,10 +1,12 @@
-export const MoreNewsCard = ({ image, description, onClick }) => {
+import { memo } from 'react';
+
+export const MoreNewsCard = memo(({ image, description, onClick }) => {
   return (
     <article
       className="flex-shrink-0 w-[280px] sm:w-[320px] lg:w-96 bg-black rounded-3xl overflow-hidden relative h-[300px] sm:h-[350px] lg:h-[28rem] mx-2"
       onClick={onClick}
     >
-      <div className="w-full h-80 overflow-hidden cursor-pointer">
+      <div className="w-full h-full overflow-hidden cursor-pointer">
         <img
           className="w-full h-full object-cover rounded-3xl hover:scale-110 transition-transform duration-300"
           src={image}
@@ -19,4 +21,4 @@ export const MoreNewsCard = ({ image, description, onClick }) => {
       </p>
     </article>
   );
-};
+});
