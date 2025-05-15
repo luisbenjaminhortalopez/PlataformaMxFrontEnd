@@ -97,19 +97,27 @@ export const HomePage = () => {
     );
   };
 
+ 
+const socialLinks = {
+  facebook: "https://www.facebook.com/profile.php?id=61573717705519",
+  //twitter: "https://twitter.com/tupagina",
+  instagram: "https://www.instagram.com/_plataformanews?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+  //youtube: "https://youtube.com/tupagina",
+};
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header logo={logo} />
 
-      <main className="w-full px-5 lg:px-10 space-y-10 flex-grow">
-        <div className="max-w-7xl mx-auto">
+       <main className="w-full px-5 lg:px-10 flex-grow">
+      <div className="max-w-7xl mx-auto lg:mb-10">
           <Banner imageUrl={banner} />
         </div>
         {renderMainSection()}
         {renderMoreNews()}
       </main>
 
-      <Footer logo={logo} />
+      <Footer logo={logo} socialLinks={socialLinks} />
     </div>
   );
 };

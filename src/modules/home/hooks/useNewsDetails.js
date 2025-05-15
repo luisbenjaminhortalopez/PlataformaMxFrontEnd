@@ -1,6 +1,29 @@
 import { useState, useEffect } from 'react';
 import { obtenerDetalleNoticia } from '../../config';
 
+const getCategoryName = (categoryId) => {
+  const categoryMap = {
+    1: "Noticias",
+    2: "Espectaculos y entretenimiento",
+    3: "Deportes",
+    4: "Economía y negocios",
+    5: "Ciencia y salud",
+    6: "Trending",
+    7: "Gadgets y tecnología",
+    8: "Especiales",
+    9: "Estilo de vida",
+    10: "Agenda Plataforma News"
+  };
+  
+  const numericId = Number(categoryId);
+  if (isNaN(numericId)) {
+    console.error(`ID de categoría inválido: ${categoryId}`);
+    return "General";
+  }
+  
+  return categoryMap[numericId] || `Categoría ${numericId}`;
+};
+
 export const useNewsDetails = (newsId) => {
   const [newsDetail, setNewsDetail] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,6 +46,7 @@ export const useNewsDetails = (newsId) => {
         }
 
         const n = arrayData[0];
+        
         const formattedNews = {
           id: n.id,
           title: n.titulo,
@@ -33,7 +57,7 @@ export const useNewsDetails = (newsId) => {
             year: "numeric",
           }),
           categoryId: n.categoria_id,
-          category: `Categoría ${n.categoria_id}`,
+          category: getCategoryName(n.categoria_id),
           images: [n.imagen01].filter(Boolean),
           content: [n.seccion01].filter(Boolean),
         };

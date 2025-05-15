@@ -1,6 +1,13 @@
 import { memo } from 'react';
 
-export const Footer = memo(({ logo }) => {
+export const Footer = memo(({ logo, socialLinks = {} }) => {
+  const {
+    facebook = "#",
+    instagram = "#",
+    twitter = "#",
+    youtube = "#"
+  } = socialLinks;
+
   return (
     <footer className="bg-black py-10 md:py-14 px-6 sm:px-12 mt-8">
       <div className="max-w-7xl mx-auto">
@@ -15,16 +22,36 @@ export const Footer = memo(({ logo }) => {
               Síguenos en nuestras redes sociales:
             </p>
             <div className="flex space-x-7 md:space-x-10 text-3xl md:text-5xl lg:text-8xl">
-              <a href="#" className="text-white hover:text-gray-300 transition-colors duration-200">
+              <a 
+                href={facebook} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-gray-300 transition-colors duration-200"
+              >
                 <i className="fab fa-facebook-f"></i>
               </a>
-              <a href="#" className="text-white hover:text-gray-300 transition-colors duration-200">
+              <a 
+                href={instagram} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-gray-300 transition-colors duration-200"
+              >
                 <i className="fab fa-instagram"></i>
               </a>
-              <a href="#" className="text-white hover:text-gray-300 transition-colors duration-200">
+              <a 
+                href={twitter} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-gray-300 transition-colors duration-200"
+              >
                 <i className="fab fa-twitter"></i>
               </a>
-              <a href="#" className="text-white hover:text-gray-300 transition-colors duration-200">
+              <a 
+                href={youtube} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white hover:text-gray-300 transition-colors duration-200"
+              >
                 <i className="fab fa-youtube"></i>
               </a>
             </div>
