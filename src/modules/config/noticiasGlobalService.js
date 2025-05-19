@@ -8,3 +8,7 @@ export const obtenerNoticias = () => {
 export const obtenerDetalleNoticia = (id) => {
   return axios.get(`${API_BASE}/noticias/obtener-detalle-noticia/${id}`);
 };
+
+export const obtenerCategorias = () => {
+  return axios.get(`${API_BASE}/noticias/obtener-categorias`);
+};

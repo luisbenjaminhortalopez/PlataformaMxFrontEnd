@@ -1,33 +1,28 @@
 import { useState, useEffect } from 'react';
-import { obtenerDetalleNoticia } from '../../config';
-
-const getCategoryName = (categoryId) => {
-  const categoryMap = {
-    1: "Noticias",
-    2: "Espectaculos y entretenimiento",
-    3: "Deportes",
-    4: "Economía y negocios",
-    5: "Ciencia y salud",
-    6: "Trending",
-    7: "Gadgets y tecnología",
-    8: "Especiales",
-    9: "Estilo de vida",
-    10: "Agenda Plataforma News"
-  };
-  
-  const numericId = Number(categoryId);
-  if (isNaN(numericId)) {
-    console.error(`ID de categoría inválido: ${categoryId}`);
-    return "General";
-  }
-  
-  return categoryMap[numericId] || `Categoría ${numericId}`;
-};
+import { obtenerDetalleNoticia, obtenerCategorias } from '../../config';
 
 export const useNewsDetails = (newsId) => {
   const [newsDetail, setNewsDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [categorias, setCategorias] = useState({});
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const { data } = await obtenerCategorias();
+        const categoriasMap = {};
+        data.forEach(cat => {
+          categoriasMap[cat.id] = cat.categoria;
+        });
+        setCategorias(categoriasMap);
+      } catch (err) {
+        console.error("Error al obtener categorías:", err);
+      }
+    };
+
+    fetchCategorias();
+  }, []);
 
   useEffect(() => {
     const fetchNewsDetail = async () => {
@@ -37,11 +32,11 @@ export const useNewsDetails = (newsId) => {
         setLoading(true);
         setError(null);
         
-        const data = await obtenerDetalleNoticia(newsId);
+        const { data } = await obtenerDetalleNoticia(newsId);
         
-        const arrayData = Array.isArray(data) ? data : data?.data ?? [];
+        const arrayData = Array.isArray(data) ? data : [];
         
-        if (!Array.isArray(arrayData) || arrayData.length === 0) {
+        if (arrayData.length === 0) {
           throw new Error("Noticia no encontrada.");
         }
 
@@ -57,8 +52,8 @@ export const useNewsDetails = (newsId) => {
             year: "numeric",
           }),
           categoryId: n.categoria_id,
-          category: getCategoryName(n.categoria_id),
-          images: [n.imagen01].filter(Boolean),
+          category: categorias[n.categoria_id] || `Categoría ${n.categoria_id}`,
+          images: [n.imagen_portada, n.imagen01].filter(Boolean),
           content: [n.seccion01].filter(Boolean),
         };
 
@@ -74,8 +69,10 @@ export const useNewsDetails = (newsId) => {
       }
     };
 
-    fetchNewsDetail();
-  }, [newsId]);
+    if (Object.keys(categorias).length > 0 || loading) {
+      fetchNewsDetail();
+    }
+  }, [newsId, categorias]);
 
   return { newsDetail, loading, error };
 };
