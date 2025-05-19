@@ -29,7 +29,7 @@ export const useNewsData = () => {
 
         const now = new Date();
         const validNews = sortedNews.filter(
-          news => new Date(news.fecha_vencimiento) > now
+          news => news.fecha_vencimiento === null || new Date(news.fecha_vencimiento) > now
         );
 
         if (validNews.length === 0) {
