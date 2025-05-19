@@ -155,10 +155,6 @@ export const NoticiaFormModal = ({
       setError("La fecha de publicación es obligatoria");
       return;
     }
-    if (!form.fecha_vencimiento) {
-      setError("La fecha de vencimiento es obligatoria");
-      return;
-    }
     if (!form.categoria_id) {
       setError("Selecciona una categoría");
       return;
@@ -297,7 +293,7 @@ export const NoticiaFormModal = ({
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
       
       <div 
-        className="bg-zinc-800  text-white p-6 rounded-lg shadow-xl w-full max-w-2xl relative z-10 m-4 max-h-[90vh] overflow-y-auto"
+        className="bg-zinc-800 text-white p-6 rounded-lg shadow-xl w-full max-w-2xl relative z-10 m-4 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
@@ -366,7 +362,7 @@ export const NoticiaFormModal = ({
               <div className="space-y-2">
                 <label className="flex items-center text-sm font-medium text-gray-300">
                   <Calendar size={16} className="mr-2" />
-                  Fecha vencimiento <span className="text-red-400 ml-1">*</span>
+                  Fecha vencimiento
                 </label>
                 <input
                   type="date"

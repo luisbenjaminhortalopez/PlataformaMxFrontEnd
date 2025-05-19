@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 
 import {
@@ -64,7 +63,7 @@ export const useNoticias = () => {
       title: data.titulo,
       image: imagenes.imagen_portada,
       fechaPublicacion: data.fecha_publicacion,
-      fechaVencimiento: data.fecha_vencimiento,
+      fechaVencimiento: data.fecha_vencimiento || null,
     };
 
     setNoticias((prev) => ordenarNoticiasPorFecha([...prev, nuevaNoticia]));
@@ -82,11 +81,13 @@ export const useNoticias = () => {
   };
 
   const hoy = new Date();
+  
   const noticiasActivas = noticias.filter(
-    (n) => new Date(n.fechaVencimiento) >= hoy
+    (n) => !n.fechaVencimiento || new Date(n.fechaVencimiento) >= hoy
   );
+  
   const noticiasVencidas = noticias.filter(
-    (n) => new Date(n.fechaVencimiento) < hoy
+    (n) => n.fechaVencimiento && new Date(n.fechaVencimiento) < hoy
   );
 
   return {

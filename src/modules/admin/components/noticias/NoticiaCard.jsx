@@ -10,7 +10,7 @@ export const NoticiaCard = ({
   onEdit, 
   onDelete 
 }) => {
-  const isExpired = new Date(fechaVencimiento) < new Date();
+  const isExpired = fechaVencimiento && new Date(fechaVencimiento) < new Date();
   
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
@@ -64,12 +64,14 @@ export const NoticiaCard = ({
             <span>Publicada: {formatDate(fechaPublicacion)}</span>
           </div>
           
-          <div className="flex items-center gap-1.5">
-            <CalendarIcon size={14} className={isExpired ? "text-red-400" : "text-gray-400"} />
-            <span className={isExpired ? "text-red-400" : "text-gray-400"}>
-              Vence: {formatDate(fechaVencimiento)}
-            </span>
-          </div>
+          {fechaVencimiento ? (
+            <div className="flex items-center gap-1.5">
+              <CalendarIcon size={14} className={isExpired ? "text-red-400" : "text-gray-400"} />
+              <span className={isExpired ? "text-red-400" : "text-gray-400"}>
+                Vence: {formatDate(fechaVencimiento)}
+              </span>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
@@ -80,7 +82,7 @@ NoticiaCard.propTypes = {
   image: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   fechaPublicacion: PropTypes.string.isRequired,
-  fechaVencimiento: PropTypes.string.isRequired,
+  fechaVencimiento: PropTypes.string, 
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired
 };
