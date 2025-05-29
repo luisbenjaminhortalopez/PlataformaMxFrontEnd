@@ -57,6 +57,9 @@ export const Footer = memo(({ logo, socialLinks = {} }) => {
             </div>
           </div>
         </div>
+        <div className="mt-8 pt-6 border-t border-zinc-700 text-center">
+          <p className="text-gray-500 text-xs">v1.0.1</p>
+        </div>
       </div>
     </footer>
   );
