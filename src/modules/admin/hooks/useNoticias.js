@@ -1,21 +1,17 @@
 import { useState, useCallback } from "react";
-
 import {
   agregarNoticia,
   actualizarNoticia,
   eliminarNoticia,
 } from "../services";
-
 import {
   obtenerDetalleNoticia,
   obtenerNoticias
 } from "../../config";
-
 import { formatearListadoNoticias, ordenarNoticiasPorFecha, formatearFecha } from "../utils";
-
+import { crearSlugConId } from "../utils/slugUtils";
 
 export const useNoticias = () => {
-  
   const [noticias, setNoticias] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,6 +19,7 @@ export const useNoticias = () => {
     try {
       setLoading(true);
       const { data } = await obtenerNoticias();
+
       const noticiasFormateadas = formatearListadoNoticias(data);
       setNoticias(ordenarNoticiasPorFecha(noticiasFormateadas));
     } catch (error) {
@@ -51,6 +48,7 @@ export const useNoticias = () => {
       seccion02: detalle.seccion02 || "",
       imagen02: detalle.imagen02,
       imagen02_url: detalle.imagen02,
+      slug: crearSlugConId(detalle.titulo, detalle.id)
     };
   };
 
@@ -64,6 +62,7 @@ export const useNoticias = () => {
       image: imagenes.imagen_portada,
       fechaPublicacion: data.fecha_publicacion,
       fechaVencimiento: data.fecha_vencimiento || null,
+      slug: crearSlugConId(data.titulo, id)
     };
 
     setNoticias((prev) => ordenarNoticiasPorFecha([...prev, nuevaNoticia]));
@@ -72,7 +71,7 @@ export const useNoticias = () => {
 
   const actualizarNoticiaExistente = async (data) => {
     await actualizarNoticia(data.id, data);
-    await fetchNoticias();
+    await fetchNoticias(); 
   };
 
   const eliminarNoticiaById = async (id) => {

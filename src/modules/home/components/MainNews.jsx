@@ -8,7 +8,7 @@ export const MainNews = memo(({ slides, onNewsClick }) => {
   
   const handleNewsClick = useCallback(() => {
     if (slides && slides.length > 0 && typeof onNewsClick === 'function') {
-      onNewsClick(slides[currentSlide].id);
+      onNewsClick(slides[currentSlide]);
     }
   }, [slides, currentSlide, onNewsClick]);
   

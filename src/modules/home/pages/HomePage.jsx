@@ -3,14 +3,16 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import logo from "../../../assets/logodos.png";
 import { useNewsData, useAdvertisement } from "../hooks";
 import { Header, Footer, Banner, MainNews, SecondaryNews, MoreNewsCard } from "../components";
+import { crearSlugConId } from "../../admin/utils/slugUtils";
 
 export const HomePage = () => {
   const { newsData, loading, error } = useNewsData();
   const { banner } = useAdvertisement();
   const navigate = useNavigate();
 
-  const handleNewsClick = (id) => {
-    navigate(`/news/${id}`);
+  const handleNewsClick = (item) => {
+    const slug = item.slug || crearSlugConId(item.title || item.description, item.id);
+    navigate(`/news/${slug}`);
   };
 
   const renderMainSection = () => {
@@ -31,7 +33,7 @@ export const HomePage = () => {
         <div className="lg:hidden w-full mb-8 h-[320px]">
           <MainNews
             slides={newsData.slide}
-            onNewsClick={(id) => handleNewsClick(id)}
+            onNewsClick={handleNewsClick}
           />
         </div>
         
@@ -42,7 +44,7 @@ export const HomePage = () => {
                 key={news.id}
                 image={news.image}
                 description={news.description}
-                onClick={() => handleNewsClick(news.id)}
+                onClick={() => handleNewsClick(news)}
               />
             ))}
           </div>
@@ -51,7 +53,7 @@ export const HomePage = () => {
             <div className="h-full flex">
               <MainNews
                 slides={newsData.slide}
-                onNewsClick={(id) => handleNewsClick(id)}
+                onNewsClick={handleNewsClick}
               />
             </div>
           </div>
@@ -62,7 +64,7 @@ export const HomePage = () => {
                 key={news.id}
                 image={news.image}
                 description={news.description}
-                onClick={() => handleNewsClick(news.id)}
+                onClick={() => handleNewsClick(news)}
               />
             ))}
           </div>
@@ -88,7 +90,7 @@ export const HomePage = () => {
                 key={news.id}
                 image={news.image}
                 description={news.description}
-                onClick={() => handleNewsClick(news.id)}
+                onClick={() => handleNewsClick(news)}
               />
             ))}
           </div>
@@ -97,20 +99,17 @@ export const HomePage = () => {
     );
   };
 
- 
-const socialLinks = {
-  facebook: "https://www.facebook.com/profile.php?id=61573717705519",
-  //twitter: "https://twitter.com/tupagina",
-  instagram: "https://www.instagram.com/_plataformanews?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
-  //youtube: "https://youtube.com/tupagina",
-};
+  const socialLinks = {
+    facebook: "https://www.facebook.com/profile.php?id=61573717705519",
+    instagram: "https://www.instagram.com/_plataformanews?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header logo={logo} />
 
-       <main className="w-full px-5 lg:px-10 flex-grow">
-      <div className="max-w-7xl mx-auto lg:mb-10">
+      <main className="w-full px-5 lg:px-10 flex-grow">
+        <div className="max-w-7xl mx-auto lg:mb-10">
           <Banner imageUrl={banner} />
         </div>
         {renderMainSection()}

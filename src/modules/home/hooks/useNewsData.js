@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { obtenerNoticias } from '../../config';
+import { crearSlugConId } from '../../admin/utils/slugUtils';
 
 export const useNewsData = () => {
   const [newsData, setNewsData] = useState({
@@ -53,16 +54,21 @@ export const useNewsData = () => {
             id: n.id,
             image: n.imagen_portada,
             title: n.titulo,
+            slug: crearSlugConId(n.titulo, n.id)
           })),
           secondNews: siguientes.map((n) => ({
             id: n.id,
             image: n.imagen_portada,
+            title: n.titulo,
             description: n.titulo,
+            slug: crearSlugConId(n.titulo, n.id)
           })),
           more: restantes.map((n) => ({
             id: n.id,
             image: n.imagen_portada,
+            title: n.titulo,
             description: n.titulo,
+            slug: crearSlugConId(n.titulo, n.id)
           })),
         });
       } catch (err) {

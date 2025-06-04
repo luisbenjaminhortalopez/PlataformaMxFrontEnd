@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { obtenerNoticias } from '../../config';
+import { crearSlugConId } from '../../admin/utils/slugUtils';
 
 export const useRelatedNews = (currentNewsId) => {
   const [relatedNews, setRelatedNews] = useState([]);
@@ -24,6 +25,7 @@ export const useRelatedNews = (currentNewsId) => {
               id: news.id,
               title: news.titulo,
               image: news.imagen_portada,
+              slug: crearSlugConId(news.titulo, news.id)
             }));
           
           setRelatedNews(filteredNews);

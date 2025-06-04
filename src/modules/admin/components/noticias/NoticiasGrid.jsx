@@ -40,7 +40,7 @@ NoticiasGrid.propTypes = {
       image: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       fechaPublicacion: PropTypes.string.isRequired,
-      fechaVencimiento: PropTypes.string.isRequired
+      fechaVencimiento: PropTypes.string
     })
   ).isRequired,
   onEdit: PropTypes.func.isRequired,
