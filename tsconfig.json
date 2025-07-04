@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@actions/*": ["./src/actions/*"],
+      "@admin/*": ["./src/modules/admin/*"],
+      "@home/*": ["./src/modules/home/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/modules/home/components/main-news.tsx", "src/app/page.tsx"],

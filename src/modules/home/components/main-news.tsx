@@ -1,24 +1,31 @@
 "use client";
 
+import { obtenerRutaSlug } from "@admin/utils/slugUtils";
 import { Slide } from "@/types/news";
+import { useRouter } from "next/navigation";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronLeft,
+  faChevronRight
+} from "@fortawesome/free-solid-svg-icons";
 
 type Props = {
   slides?: Slide[];
-  onNewsClick?: (news: Slide) => void;
 };
 
-const MainNews = ({ slides, onNewsClick }: Props) => {
+const MainNews = ({ slides }: Props) => {
+  const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const AUTOPLAY_INTERVAL = 5000;
 
   const handleNewsClick = useCallback(() => {
-    if (slides && slides.length > 0 && typeof onNewsClick === "function") {
-      onNewsClick(slides[currentSlide]);
+    if (slides && slides.length > 0) {
+      router.push(obtenerRutaSlug(slides[currentSlide]));
     }
-  }, [slides, currentSlide, onNewsClick]);
+  }, [slides, currentSlide, router]);
 
   const prevSlide = useCallback(() => {
     if (slides && slides.length > 0) {
@@ -104,7 +111,7 @@ const MainNews = ({ slides, onNewsClick }: Props) => {
               className="text-white text-2xl hover:text-gray-300 transition-colors"
               aria-label="Previous slide"
             >
-              <i className="fas fa-chevron-left"></i>
+              <FontAwesomeIcon icon={faChevronLeft} />
             </button>
             <button
               onClick={(e) => {
@@ -115,7 +122,7 @@ const MainNews = ({ slides, onNewsClick }: Props) => {
               className="text-white text-2xl hover:text-gray-300 transition-colors"
               aria-label="Next slide"
             >
-              <i className="fas fa-chevron-right"></i>
+              <FontAwesomeIcon icon={faChevronRight} />
             </button>
           </div>
 

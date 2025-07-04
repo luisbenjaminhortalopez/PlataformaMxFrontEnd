@@ -2,7 +2,7 @@
 
 import { API_BASE } from "@/constants/api";
 import { Categoria, DetalleNoticia, NewsData, Noticia } from "@/types/news";
-import { crearSlugConId } from "@/modules/admin/utils/slugUtils";
+import { crearSlugConId } from "@admin/utils/slugUtils";
 import axios from "axios";
 
 export const obtenerNoticias = async () => {
@@ -23,8 +23,6 @@ export const obtenerCategorias = async () => {
 
 export const fetchNews = async (): Promise<NewsData | undefined> => {
   try {
-    // setError(null);
-
     const response = await obtenerNoticias();
     const data = response.data;
 
@@ -86,7 +84,7 @@ export const fetchNews = async (): Promise<NewsData | undefined> => {
       }))
     };
   } catch (err) {
-    // setError(err.message || "Error al cargar noticias");
     console.error("Error loading news:", err);
+    return undefined;
   }
 };

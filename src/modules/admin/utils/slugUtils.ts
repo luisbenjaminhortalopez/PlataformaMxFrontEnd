@@ -1,4 +1,4 @@
-import { Noticia } from "@/types/news";
+import { Noticia, Slide } from "@/types/news";
 
 export const generarSlug = (titulo: string) => {
   return titulo
@@ -26,4 +26,10 @@ export const formatearNoticiasConSlugs = (noticias: Noticia[]) => {
     ...noticia,
     slug: crearSlugConId(noticia.titulo, noticia.id)
   }));
+};
+
+export const obtenerRutaSlug = (item: Slide) => {
+  const slug =
+    item.slug || crearSlugConId(item.title || item.description, item.id);
+  return `/news/${slug}`;
 };
