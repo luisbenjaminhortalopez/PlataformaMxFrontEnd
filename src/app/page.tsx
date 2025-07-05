@@ -1,13 +1,8 @@
+import { socialLinks } from "@/constants/social-media";
 import { Banner, Footer, Header, HomeNews } from "@home/components";
 import { Suspense } from "react";
 
 export default async function Home() {
-  const socialLinks = {
-    facebook: "https://www.facebook.com/profile.php?id=61573717705519",
-    instagram:
-      "https://www.instagram.com/_plataformanews?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-  };
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header logo="/logodos.png" />

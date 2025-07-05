@@ -1,4 +1,5 @@
 import { fetchNewsDetail, loadRelatedNews } from "@/actions";
+import { socialLinks } from "@/constants/social-media";
 import { extraerIdDeSlug } from "@/modules/admin/utils/slugUtils";
 import {
   Banner,
@@ -20,12 +21,6 @@ const DetailPage = async ({ params }: Props) => {
   const id = extraerIdDeSlug(slug);
   const newsDetail = await fetchNewsDetail(id);
   const relatedNews = await loadRelatedNews(id);
-
-  const socialLinks = {
-    facebook: "https://www.facebook.com/profile.php?id=61573717705519",
-    instagram:
-      "https://www.instagram.com/_plataformanews?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-  };
 
   if (!newsDetail || !id) {
     return (
