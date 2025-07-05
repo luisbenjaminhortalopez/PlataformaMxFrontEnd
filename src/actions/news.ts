@@ -1,24 +1,12 @@
 "use server";
 
 import { API_BASE } from "@/constants/api";
-import { Categoria, DetalleNoticia, NewsData, Noticia } from "@/types/news";
+import { NewsData, Noticia } from "@/types/news";
 import { crearSlugConId } from "@admin/utils/slugUtils";
 import axios from "axios";
 
 export const obtenerNoticias = async () => {
   return await axios.get<Noticia[]>(`${API_BASE}/noticias/obtener-noticias`);
-};
-
-export const obtenerDetalleNoticia = async (id: number) => {
-  return await axios.get<DetalleNoticia>(
-    `${API_BASE}/noticias/obtener-detalle-noticia/${id}`
-  );
-};
-
-export const obtenerCategorias = async () => {
-  return await axios.get<Categoria[]>(
-    `${API_BASE}/noticias/obtener-categorias`
-  );
 };
 
 export const fetchNews = async (): Promise<NewsData | undefined> => {

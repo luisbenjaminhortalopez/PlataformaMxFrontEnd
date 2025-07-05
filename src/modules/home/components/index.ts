@@ -7,3 +7,6 @@ export * from './more-news';
 export * from './more-news-card';
 export * from './secondary-news';
 export * from './home-news';
+export * from './related-news';
+export * from './news-detail';
+export * from './image';

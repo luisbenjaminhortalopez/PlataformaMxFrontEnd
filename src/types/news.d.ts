@@ -20,6 +20,17 @@ export interface DetalleNoticia {
   imagen02: string;
 }
 
+export interface NewsDetailMapped {
+  id: number;
+  title: string;
+  author: string;
+  date: string;
+  categoryId: number;
+  category: string;
+  images: string[];
+  content: string[];
+}
+
 export interface Categoria {
   id: number;
   categoria: string;

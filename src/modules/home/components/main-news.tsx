@@ -9,6 +9,7 @@ import {
   faChevronLeft,
   faChevronRight
 } from "@fortawesome/free-solid-svg-icons";
+import { Image } from "./image";
 
 type Props = {
   slides?: Slide[];
@@ -79,16 +80,11 @@ const MainNews = ({ slides }: Props) => {
       onClick={handleNewsClick}
     >
       <div className="w-full h-full overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="w-full h-full object-cover rounded-3xl hover:scale-105 transition-transform duration-300"
+        <Image
           src={slides[currentSlide].image}
           alt={slides[currentSlide].title}
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src =
-              "https://via.placeholder.com/1200x800?text=Imagen+no+disponible";
-          }}
+          className="w-full h-full object-cover rounded-3xl hover:scale-105 transition-transform duration-300"
+          fallbackSrc="https://via.placeholder.com/1200x800?text=Imagen+no+disponible"
         />
       </div>
 
