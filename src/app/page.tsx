@@ -1,4 +1,5 @@
 import { socialLinks } from "@/constants/social-media";
+import { HomeNewsSkeleton } from "@home/skeletons";
 import { Banner, Footer, Header, HomeNews } from "@home/components";
 import { Suspense } from "react";
 
@@ -11,11 +12,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto lg:mb-10">
           <Banner />
         </div>
-        <Suspense
-          fallback={
-            <div className="text-center py-10">Cargando noticias...</div>
-          }
-        >
+        <Suspense fallback={<HomeNewsSkeleton />}>
           <HomeNews />
         </Suspense>
       </main>
