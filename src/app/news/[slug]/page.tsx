@@ -8,6 +8,8 @@ import {
   NewsDetail,
   RelatedNews
 } from "@/modules/home/components";
+import { Metadata } from "next";
+import { headers } from "next/headers";
 
 type Props = {
   params: {
@@ -58,5 +60,56 @@ const DetailPage = async ({ params }: Props) => {
     </>
   );
 };
+
+export async function generateMetadata({
+  params
+}: Props): Promise<Metadata | null> {
+  const headersList = await headers();
+  const host = headersList.get("host") || "localhost";
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+  const baseUrl = `${protocol}://${host}`;
+  const { slug } = await params;
+
+  const id = extraerIdDeSlug(slug);
+  const newsDetail = await fetchNewsDetail(id);
+
+  if (!newsDetail || !id) {
+    return null;
+  }
+
+  return {
+    title: newsDetail.title,
+    description: `${newsDetail.content
+      .join(" ")
+      .substring(0, 160)
+      .trimEnd()}...`,
+    openGraph: {
+      title: newsDetail.title,
+      description: `${newsDetail.content
+        .join(" ")
+        .substring(0, 160)
+        .trimEnd()}...`,
+      url: `${baseUrl}/news/${slug}`,
+      siteName: "Plataforma News",
+      images: newsDetail.images.map((img) => ({
+        url: img,
+        width: 1200,
+        height: 630,
+        alt: newsDetail.title
+      })),
+      locale: "es_MX",
+      type: "article"
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: newsDetail.title,
+      description: `${newsDetail.content
+        .join(" ")
+        .substring(0, 160)
+        .trimEnd()}...`,
+      images: newsDetail.images
+    }
+  };
+}
 
 export default DetailPage;
