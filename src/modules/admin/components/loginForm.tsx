@@ -18,8 +18,8 @@ export const LoginForm = () => {
       const response = await login(username, password);
       const { usuario } = response.data;
 
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("adminId", usuario.id);
+      document.cookie = `isAuthenticated=true; path=/`;
+      document.cookie = `adminId=${usuario.id}; path=/`;
 
       router.push("/admin/noticias");
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
