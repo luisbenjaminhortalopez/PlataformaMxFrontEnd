@@ -67,7 +67,7 @@ const AdminNoticias = () => {
   };
 
   const handleRequestDelete = (id: number) => {
-    if (!selectedItem) return;
+    if (!selectedItem) return; // TODO: Check if this is necessary
     setSelectedItem({ ...selectedItem, id });
     setShowDeleteModal(true);
   };
