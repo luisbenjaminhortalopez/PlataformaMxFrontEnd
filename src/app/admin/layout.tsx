@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { AdminLayout as Layout } from "@admin/components";
 
 type Props = {
   children: React.ReactNode;
@@ -13,7 +14,7 @@ const AdminLayout = async ({ children }: Readonly<Props>) => {
     return redirect("/login");
   }
 
-  return <>{children}</>;
+  return <Layout>{children}</Layout>;
 };
 
 export default AdminLayout;

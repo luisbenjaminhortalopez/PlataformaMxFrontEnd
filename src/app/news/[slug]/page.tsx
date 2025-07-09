@@ -1,13 +1,13 @@
 import { fetchNewsDetail, loadRelatedNews } from "@/actions";
 import { socialLinks } from "@/constants/social-media";
-import { extraerIdDeSlug } from "@/modules/admin/utils/slugUtils";
+import { extraerIdDeSlug } from "@admin/utils";
 import {
   Banner,
   Footer,
   Header,
   NewsDetail,
   RelatedNews
-} from "@/modules/home/components";
+} from "@home/components";
 import { Metadata } from "next";
 import { headers } from "next/headers";
 

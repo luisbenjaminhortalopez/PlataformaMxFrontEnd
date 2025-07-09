@@ -4,7 +4,7 @@ import axios from "axios";
 import { fetchCategorias } from "./categories";
 
 export const obtenerDetalleNoticia = async (id: number) => {
-  return await axios.get<DetalleNoticia>(
+  return await axios.get<DetalleNoticia[]>(
     `${API_BASE}/noticias/obtener-detalle-noticia/${id}`
   );
 };

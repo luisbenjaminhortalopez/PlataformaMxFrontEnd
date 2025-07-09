@@ -49,3 +49,28 @@ export interface NewsData {
   secondNews: Slide[];
   more: Slide[];
 }
+
+export interface NewsForm {
+  id: number | null;
+  titulo: string;
+  autor: string;
+  fecha_publicacion: string;
+  fecha_vencimiento: string | null;
+  imagen_portada: string | null;
+  categoria_id: string;
+  seccion01: string;
+  imagen01: string | null;
+  seccion02: string;
+  imagen02: string | null;
+  imagen_portada_url?: string;
+  imagen01_url?: string;
+  imagen02_url?: string;
+}
+
+export interface FormattedNews {
+  id: number;
+  title: string;
+  image: string;
+  fechaPublicacion: string;
+  fechaVencimiento: string | null;
+}

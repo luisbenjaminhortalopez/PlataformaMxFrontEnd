@@ -1,8 +1,8 @@
 "use server";
 
 import { API_BASE } from "@/constants/api";
-import { NewsData, Noticia } from "@/types/news";
-import { crearSlugConId } from "@admin/utils/slugUtils";
+import { crearSlugConId } from "@admin/utils";
+import { NewsData, NewsForm, Noticia } from "@/types/news";
 import axios from "axios";
 
 export const obtenerNoticias = async () => {
@@ -75,4 +75,36 @@ export const fetchNews = async (): Promise<NewsData | undefined> => {
     console.error("Error loading news:", err);
     return undefined;
   }
+};
+
+export const agregarNoticias = async (data: NewsForm) => {
+  const formData = new FormData();
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) {
+      formData.append(key, value);
+    }
+  });
+
+  return axios.post(`${API_BASE}/noticias/agregar-noticia`, formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+};
+
+export const actualizarNoticia = (id: number, data: NewsForm) => {
+  const formData = new FormData();
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) {
+      formData.append(key, value);
+    }
+  });
+
+  return axios.put(`${API_BASE}/noticias/actualizar-noticia/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+};
+
+export const eliminarNoticia = (id: number) => {
+  return axios.delete(`${API_BASE}/noticias/eliminar-noticia/${id}`);
 };

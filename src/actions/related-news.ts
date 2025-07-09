@@ -1,4 +1,4 @@
-import { crearSlugConId } from "@/modules/admin/utils/slugUtils";
+import { crearSlugConId } from "@admin/utils";
 import { obtenerNoticias } from "./news";
 import { Slide } from "@/types/news";
 

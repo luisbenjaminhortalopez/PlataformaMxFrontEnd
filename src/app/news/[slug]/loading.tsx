@@ -1,5 +1,5 @@
 import { socialLinks } from "@/constants/social-media";
-import { Footer, Header } from "@/modules/home/components";
+import { Footer, Header } from "@home/components";
 
 const Loading = () => {
   return (

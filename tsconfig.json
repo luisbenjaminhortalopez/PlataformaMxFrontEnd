@@ -22,6 +22,7 @@
       "@/*": ["./src/*"],
       "@actions/*": ["./src/actions/*"],
       "@admin/*": ["./src/modules/admin/*"],
+      "@admin/utils/*": ["./src/modules/admin/utils/*"],
       "@home/*": ["./src/modules/home/*"],
     }
   },

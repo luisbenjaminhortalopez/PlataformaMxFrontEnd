@@ -1,6 +1,6 @@
 "use client";
 
-import { obtenerRutaSlug } from "@/modules/admin/utils/slugUtils";
+import { obtenerRutaSlug } from "@admin/utils";
 import { Slide } from "@/types/news";
 import { useRouter } from "next/navigation";
 import { Image } from "./image";
