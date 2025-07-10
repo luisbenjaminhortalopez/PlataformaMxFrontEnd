@@ -4,6 +4,7 @@ import { API_BASE } from "@/constants/api";
 import { crearSlugConId } from "@admin/utils";
 import { NewsData, NewsForm, Noticia } from "@/types/news";
 import axios from "axios";
+import { revalidatePath } from "next/cache";
 
 export const obtenerNoticias = async () => {
   return await axios.get<Noticia[]>(`${API_BASE}/noticias/obtener-noticias`);
@@ -86,12 +87,14 @@ export const agregarNoticias = async (data: NewsForm) => {
     }
   });
 
-  return axios.post(`${API_BASE}/noticias/agregar-noticia`, formData, {
+  await axios.post(`${API_BASE}/noticias/agregar-noticia`, formData, {
     headers: { "Content-Type": "multipart/form-data" }
   });
+
+  revalidatePath("/admin/noticias");
 };
 
-export const actualizarNoticia = (id: number, data: NewsForm) => {
+export const actualizarNoticia = async (id: number, data: NewsForm) => {
   const formData = new FormData();
 
   Object.entries(data).forEach(([key, value]) => {
@@ -100,11 +103,14 @@ export const actualizarNoticia = (id: number, data: NewsForm) => {
     }
   });
 
-  return axios.put(`${API_BASE}/noticias/actualizar-noticia/${id}`, formData, {
+  await axios.put(`${API_BASE}/noticias/actualizar-noticia/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" }
   });
+
+  revalidatePath("/admin/noticias");
 };
 
-export const eliminarNoticia = (id: number) => {
-  return axios.delete(`${API_BASE}/noticias/eliminar-noticia/${id}`);
+export const eliminarNoticia = async (id: number) => {
+  await axios.delete(`${API_BASE}/noticias/eliminar-noticia/${id}`);
+  revalidatePath("/admin/noticias");
 };

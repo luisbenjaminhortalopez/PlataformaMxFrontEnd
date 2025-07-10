@@ -1,3 +1,5 @@
+"use server";
+
 import { API_BASE } from "@/constants/api";
 import axios from "axios";
 import { cookies } from "next/headers";

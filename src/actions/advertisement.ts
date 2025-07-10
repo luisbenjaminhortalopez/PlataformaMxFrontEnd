@@ -37,7 +37,7 @@ export const fetchAdvertisement = async (): Promise<string | undefined> => {
   }
 };
 
-export const agregarPublicidad = (data: PublicidadForm) => {
+export const agregarPublicidad = async (data: PublicidadForm) => {
   const formData = new FormData();
   Object.entries(data).forEach(([key, value]) => {
     if (value) formData.append(key, value);
@@ -48,7 +48,7 @@ export const agregarPublicidad = (data: PublicidadForm) => {
   });
 };
 
-export const actualizarPublicidad = (id: number, data: PublicidadForm) => {
+export const actualizarPublicidad = async (id: number, data: PublicidadForm) => {
   const formData = new FormData();
   Object.entries(data).forEach(([key, value]) => {
     if (value !== null && value !== undefined) {
@@ -65,6 +65,6 @@ export const actualizarPublicidad = (id: number, data: PublicidadForm) => {
   );
 };
 
-export const eliminarPublicidad = (id: number) => {
+export const eliminarPublicidad = async (id: number) => {
   return axios.delete(`${API_BASE}/publicidad/eliminar-publicidad/${id}`);
 };

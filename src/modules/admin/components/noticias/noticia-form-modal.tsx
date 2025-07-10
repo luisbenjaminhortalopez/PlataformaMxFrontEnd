@@ -18,6 +18,7 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: NewsForm) => void;
+  isSubmitting?: boolean;
   modo?: string;
   initialData?: Partial<NewsForm>;
 };
@@ -32,8 +33,9 @@ export const NoticiaFormModal = ({
   isOpen,
   onClose,
   onSubmit,
+  isSubmitting = false,
   modo = "agregar",
-  initialData = {}
+  initialData
 }: Props) => {
   const [form, setForm] = useState<NewsForm>({
     id: null,
@@ -57,7 +59,6 @@ export const NoticiaFormModal = ({
 
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchCategorias = async () => {
@@ -120,8 +121,7 @@ export const NoticiaFormModal = ({
       });
     }
     setError("");
-    setIsSubmitting(false);
-  }, [isOpen, initialData, modo]);
+  }, [initialData, isOpen, modo]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -173,7 +173,8 @@ export const NoticiaFormModal = ({
       }
     };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (isSubmitting) return;
 
     if (!form.titulo.trim()) {
@@ -210,29 +211,26 @@ export const NoticiaFormModal = ({
     const formData = { ...form };
 
     if (modo === "editar") {
-      if (!formData.imagen_portada && initialData.imagen_portada_url) {
+      if (!formData.imagen_portada && initialData?.imagen_portada_url) {
         formData.imagen_portada_url = initialData.imagen_portada_url;
       }
 
-      if (!formData.imagen01 && initialData.imagen01_url) {
+      if (!formData.imagen01 && initialData?.imagen01_url) {
         formData.imagen01_url = initialData.imagen01_url;
       }
 
-      if (!formData.imagen02 && initialData.imagen02_url) {
+      if (!formData.imagen02 && initialData?.imagen02_url) {
         formData.imagen02_url = initialData.imagen02_url;
       }
     }
 
     setError("");
-    setIsSubmitting(true);
 
     try {
       await onSubmit(formData);
     } catch (err) {
       console.error("Error al enviar el formulario:", err);
       setError("Ha ocurrido un error al guardar la noticia");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -242,7 +240,7 @@ export const NoticiaFormModal = ({
     required = true
   ) => {
     const fieldPreview = previews[fieldName];
-    const fieldFile = form[fieldName];
+    const fieldFile = form[fieldName] as File | null;
 
     return (
       <div className="space-y-2">
@@ -334,9 +332,10 @@ export const NoticiaFormModal = ({
     >
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
-      <div
+      <form
         className="bg-zinc-800 text-white p-6 rounded-lg shadow-xl w-full max-w-2xl relative z-10 m-4 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
+        onSubmit={handleSubmit}
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold">
@@ -489,7 +488,7 @@ export const NoticiaFormModal = ({
 
         <div className="flex flex-col sm:flex-row gap-3 mt-6">
           <button
-            onClick={handleSubmit}
+            type="submit"
             className={`flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 font-medium rounded transition-colors flex items-center justify-center ${
               isSubmitting ? "opacity-70 cursor-not-allowed" : ""
             }`}
@@ -514,7 +513,7 @@ export const NoticiaFormModal = ({
             Cancelar
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };
