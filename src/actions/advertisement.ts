@@ -3,11 +3,17 @@
 import { API_BASE } from "@/constants/api";
 import { Publicidad, PublicidadForm } from "@/types/publicidad";
 import axios from "axios";
+import { revalidatePath } from "next/cache";
 
 export const obtenerPublicidad = async () => {
-  return await axios.get<Publicidad[]>(
-    `${API_BASE}/publicidad/obtener-publicidad`
-  );
+  try {
+    return await axios.get<Publicidad[]>(
+      `${API_BASE}/publicidad/obtener-publicidad`
+    );
+  } catch (error) {
+    console.error("Error al obtener la publicidad:", error);
+    return { data: [], error: "Error al obtener la publicidad" };
+  }
 };
 
 export const fetchAdvertisement = async (): Promise<string | undefined> => {
@@ -43,12 +49,17 @@ export const agregarPublicidad = async (data: PublicidadForm) => {
     if (value) formData.append(key, value);
   });
 
-  return axios.post(`${API_BASE}/publicidad/agregar-publicidad`, formData, {
+  await axios.post(`${API_BASE}/publicidad/agregar-publicidad`, formData, {
     headers: { "Content-Type": "multipart/form-data" }
   });
+
+  revalidatePath("/admin/publicidad");
 };
 
-export const actualizarPublicidad = async (id: number, data: PublicidadForm) => {
+export const actualizarPublicidad = async (
+  id: number,
+  data: PublicidadForm
+) => {
   const formData = new FormData();
   Object.entries(data).forEach(([key, value]) => {
     if (value !== null && value !== undefined) {
@@ -56,15 +67,18 @@ export const actualizarPublicidad = async (id: number, data: PublicidadForm) => 
     }
   });
 
-  return axios.put(
+  await axios.put(
     `${API_BASE}/publicidad/actualizar-publicidad/${id}`,
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" }
     }
   );
+
+  revalidatePath("/admin/publicidad");
 };
 
 export const eliminarPublicidad = async (id: number) => {
-  return axios.delete(`${API_BASE}/publicidad/eliminar-publicidad/${id}`);
+  await axios.delete(`${API_BASE}/publicidad/eliminar-publicidad/${id}`);
+  revalidatePath("/admin/publicidad");
 };
