@@ -12,9 +12,9 @@ import { Metadata } from "next";
 import { headers } from "next/headers";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 const DetailPage = async ({ params }: Props) => {
