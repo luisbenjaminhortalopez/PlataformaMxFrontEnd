@@ -1,4 +1,5 @@
 export * from "./advertisement";
+export * from "./auth";
 export * from "./news";
 export * from "./news-detail";
 export * from "./categories";

@@ -1,6 +1,6 @@
 "use client";
 
-import { login } from "@/actions/auth";
+import { loginPOST } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -15,7 +15,7 @@ export const LoginForm = () => {
     setError("");
 
     try {
-      const response = await login(username, password);
+      const response = await loginPOST(username, password);
       const { usuario } = response.data;
 
       document.cookie = `isAuthenticated=true; path=/`;
