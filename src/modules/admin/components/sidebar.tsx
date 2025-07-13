@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Image } from "@home/components";
-import { logout } from "@/actions";
+import { logout } from "@/lib/actions";
 import { HamburguerButton } from "./hamburguer-button";
 
 type Props = {

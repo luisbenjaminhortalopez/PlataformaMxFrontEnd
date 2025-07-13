@@ -1,7 +1,4 @@
-import {
-  eliminarNoticia,
-  obtenerDetalleNoticia
-} from "@/actions";
+import { eliminarNoticia, obtenerDetalleNoticia } from "@/lib/actions";
 import { crearSlugConId, formatearFecha } from "../utils";
 import { NewsForm } from "@/types/news";
 

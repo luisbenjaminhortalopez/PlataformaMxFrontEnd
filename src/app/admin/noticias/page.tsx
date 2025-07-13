@@ -1,4 +1,4 @@
-import { obtenerNoticias } from "@/actions";
+import { obtenerNoticias } from "@/lib/actions";
 import {
   formatearListadoNoticias,
   ordenarNoticiasPorFecha

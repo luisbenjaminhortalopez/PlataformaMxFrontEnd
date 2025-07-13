@@ -10,7 +10,7 @@ import {
   PageHeader
 } from "@admin/components";
 import { useState, useTransition } from "react";
-import { actualizarNoticia, agregarNoticias } from "@/actions";
+import { actualizarNoticia, agregarNoticias } from "@/lib/actions";
 
 type Props = {
   noticias: FormattedNews[];

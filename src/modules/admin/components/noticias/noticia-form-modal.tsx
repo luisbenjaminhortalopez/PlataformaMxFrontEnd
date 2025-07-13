@@ -10,7 +10,7 @@ import {
   Layers,
   Loader
 } from "lucide-react";
-import { obtenerCategorias } from "@/actions";
+import { obtenerCategorias } from "@/lib/actions";
 import { Categoria, NewsForm } from "@/types/news";
 import { Image } from "@home/components";
 

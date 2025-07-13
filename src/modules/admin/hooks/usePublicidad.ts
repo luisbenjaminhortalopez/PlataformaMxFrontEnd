@@ -2,7 +2,7 @@ import {
   actualizarPublicidad,
   agregarPublicidad,
   eliminarPublicidad
-} from "@/actions";
+} from "@/lib/actions";
 import { PublicidadForm } from "@/types/publicidad";
 
 export const usePublicidad = () => {

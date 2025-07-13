@@ -1,4 +1,4 @@
-import { obtenerPublicidad } from "@/actions";
+import { obtenerPublicidad } from "@/lib/actions";
 import { Publicidad } from "@/types/publicidad";
 import { PublicidadPage } from "@admin/pages";
 

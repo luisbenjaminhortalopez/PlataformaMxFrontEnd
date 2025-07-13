@@ -1,4 +1,4 @@
-import { fetchNewsDetail, loadRelatedNews } from "@/actions";
+import { fetchNewsDetail, loadRelatedNews } from "@/lib/actions";
 import { socialLinks } from "@/constants/social-media";
 import { extraerIdDeSlug } from "@admin/utils";
 import {

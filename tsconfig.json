@@ -20,7 +20,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@actions/*": ["./src/actions/*"],
+      "@actions/*": ["src/lib/actions/*"],
       "@admin/*": ["./src/modules/admin/*"],
       "@admin/utils/*": ["./src/modules/admin/utils/*"],
       "@home/*": ["./src/modules/home/*"],
