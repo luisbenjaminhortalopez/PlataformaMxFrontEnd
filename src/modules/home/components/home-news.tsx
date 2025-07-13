@@ -1,4 +1,4 @@
-import { fetchNews } from "@/lib/actions";
+import { fetchNews } from "@actions";
 import { MainSection } from "./main-section";
 import { MoreNews } from "./more-news";
 

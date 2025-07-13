@@ -1,4 +1,4 @@
-import { fetchAdvertisement } from "@/lib/actions";
+import { fetchAdvertisement } from "@actions";
 import { Image } from "./image";
 
 export const Banner = async () => {

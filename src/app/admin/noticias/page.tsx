@@ -1,9 +1,9 @@
-import { obtenerNoticias } from "@/lib/actions";
+import { obtenerNoticias } from "@actions";
 import {
   formatearListadoNoticias,
   ordenarNoticiasPorFecha
 } from "@/modules/admin/utils";
-import { NoticiasPage } from "@/modules/admin/pages";
+import { NoticiasPage } from "@admin/pages";
 
 const AdminNoticias = async () => {
   const { data } = await obtenerNoticias();
