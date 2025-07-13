@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { socialLinks } from "@/constants/social-media";
 import { HomeNewsSkeleton } from "@home/skeletons";
 import { Banner, Footer, Header, HomeNews } from "@home/components";
